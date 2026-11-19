@@ -47,6 +47,7 @@ export const PoseSchema = z.enum([
   'facing-away',
   'crouching',
   'dramatic-profile',
+  'power-awakening',
 ]);
 export const ExpressionSchema = z.enum([
   'neutral',
@@ -55,6 +56,19 @@ export const ExpressionSchema = z.enum([
   'smirk',
   'menacing-glow',
   'shadowed',
+  'determined',
+  'pain',
+]);
+
+export const ShadingIntensitySchema = z.enum(['soft', 'standard', 'heavy', 'dramatic-noir']);
+export const LightDirectionSchema = z.enum(['left', 'right', 'top', 'bottom-fire', 'back-rim']);
+export const WeaponPropSchema = z.enum([
+  'none',
+  'stone-spear',
+  'katana',
+  'dagger-dual',
+  'magic-orb',
+  'greatsword',
 ]);
 
 /** Procedural character silhouette built from the cast member's palette. */
@@ -71,6 +85,16 @@ export const CharacterFigureLayerSchema = z.object({
   rimLightColor: ColorSchema.optional(),
   /** Classic manhwa glowing eyes in shadow. */
   glowEyes: z.boolean().default(false),
+  /** Depth of cel-shaded shadows and hatch lines. */
+  shadingIntensity: ShadingIntensitySchema.default('standard'),
+  /** Primary light source direction for cel-shading & catchlights. */
+  lightDirection: LightDirectionSchema.default('left'),
+  /** Optional glowing energy aura around the character (0 = off, 1 = blazing). */
+  auraIntensity: z.number().min(0).max(1).default(0),
+  /** Optional built-in weapon/prop anchored to the character's hands/back. */
+  weaponProp: WeaponPropSchema.default('none'),
+  /** Optional Pass-2 custom SVG detail markup rendered in character local coords (0,-535 = head center). */
+  detailOverlaySvg: z.string().max(25_000).optional(),
   zIndex: z.number().int().default(20),
 });
 
@@ -157,6 +181,9 @@ export type EnvironmentLayer = z.infer<typeof EnvironmentLayerSchema>;
 export type Framing = z.infer<typeof FramingSchema>;
 export type Pose = z.infer<typeof PoseSchema>;
 export type Expression = z.infer<typeof ExpressionSchema>;
+export type ShadingIntensity = z.infer<typeof ShadingIntensitySchema>;
+export type LightDirection = z.infer<typeof LightDirectionSchema>;
+export type WeaponProp = z.infer<typeof WeaponPropSchema>;
 export type CharacterFigureLayer = z.infer<typeof CharacterFigureLayerSchema>;
 export type SvgRawLayer = z.infer<typeof SvgRawLayerSchema>;
 export type EffectKind = z.infer<typeof EffectKindSchema>;

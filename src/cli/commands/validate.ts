@@ -40,6 +40,9 @@ export function runValidate(filePath: string, opts: ValidateCommandOptions): num
       if (layer.type === 'svg_raw') {
         const s = sanitizeSvgMarkup(layer.svgMarkup);
         for (const w of s.warnings) svgWarnings.push({ panelId: panel.id, layerIndex: idx, warning: w });
+      } else if (layer.type === 'character_figure' && layer.detailOverlaySvg) {
+        const s = sanitizeSvgMarkup(layer.detailOverlaySvg);
+        for (const w of s.warnings) svgWarnings.push({ panelId: panel.id, layerIndex: idx, warning: w });
       }
     });
   }

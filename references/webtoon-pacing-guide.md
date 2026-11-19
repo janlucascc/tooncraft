@@ -4,7 +4,24 @@ In vertical-scroll manhwa, **vertical space equals time**. Unlike page-based man
 
 ---
 
-## 1. Panel Height Semantics (at 800px Canvas Width)
+## 1. The Manhwa 5-Beat Episode Formula
+
+Structure every short episode or scene sequence around 5 distinct emotional and visual beats:
+
+1. **Beat 1 — The Visual Hook / Cold Open (`establishing` or `low-angle`, `850–1050 px`)**
+   - Immediate atmosphere and stakes. Establish the harsh world or imminent threat in the very first scroll.
+2. **Beat 2 — Painful Status Quo / Vulnerability (`close-up` or `medium`, `520–720 px`)**
+   - Show the protagonist's struggle, exhaustion, hunger, or weakness so the reader bonds with their plight.
+3. **Beat 3 — The Cosmic / Catalyst Incident (`diagonal-both` or `shattered`, `780–980 px`)**
+   - An anomalous event breaks the status quo (a falling star, a dungeon trap, a mysterious artifact). Follow with `pacingAfter: "dramatic_pause"`.
+4. **Beat 4 — Visceral Climax / Transformation (`full-bleed` splash, `980–1300 px`)**
+   - High-contrast lighting (`shadingIntensity: "dramatic-noir"`), `pose: "power-awakening"`, glowing eyes, radial speedlines, and raw physical/spiritual metamorphosis.
+5. **Beat 5 — Impact Cliffhanger (`extreme-close-up` / `eyes-only` or heroic `low-angle`, `850–1100 px`)**
+   - A chilling revelation, system message, or iconic closing line that leaves the reader desperate for the next episode.
+
+---
+
+## 2. Panel Height Semantics (at 800px Canvas Width)
 
 | Panel Height | Feel / Role | Best Frame Types |
 | :--- | :--- | :--- |
@@ -15,7 +32,7 @@ In vertical-scroll manhwa, **vertical space equals time**. Unlike page-based man
 
 ---
 
-## 2. Gutter Pacing Presets (`pacingAfter`)
+## 3. Gutter Pacing Presets (`pacingAfter`)
 
 | Preset | Pixels | Narrative Meaning | Recommended `pacingTransition` |
 | :--- | :---: | :--- | :--- |
@@ -28,11 +45,15 @@ In vertical-scroll manhwa, **vertical space equals time**. Unlike page-based man
 
 ---
 
-## 3. Golden Rules of Manhwa Direction
+## 4. Golden Rules of Manhwa Direction & Dialogue Cascading
 
-1. **The 3-Second Mobile Rule:** A reader scrolls ~1 mobile viewport (`~1730px` at 800px canvas scale) every 2–3 seconds. Place at most **1–2 panels** per screen during action, and use `dramatic_pause` before major reveals so the reveal scrolls cleanly into view.
-2. **Shot Alternation:** Never stack three identical `medium` shots in a row. Alternate:
-   `establishing` → `medium` → `close-up` → `extreme-close-up (eyes-only)` → `dutch-angle` splash.
-3. **Lettering Economy:** Keep each speech bubble under **18–25 words**. Split long monologues across two stacked bubbles (top-left at `y: 22`, bottom-right at `y: 78`) to guide the reader's eye downward along a Z-path.
-4. **Tail Targeting:** Always point `tail.target` near the speaker's mouth/head (e.g., if `character_figure` is at `x: 35, y: 100` in `close-up`, head center is around `x: 38, y: 52`).
-5. **Contrast First:** On dark themes (`cyberpunk-neon`, `solo-system`, `noir-thriller`), keep protagonist dialogue bright (`#FFFFFF` fill) and reserve dark tinted bubbles for antagonists, narration or whispers.
+1. **Short Cascading Bubbles (3–12 Words Each):**
+   - Never dump a 30-word paragraph into a single bubble.
+   - Break a monologue into **2 or 3 short descending bubbles** (`y: 16` → `y: 44` → `y: 78`) staggering left-to-right (`x: 28` → `x: 72`) so the reader's eye flows effortlessly down the vertical canvas.
+2. **Aggressive Camera Alternation:**
+   - Never stack two identical `medium` or `waist-up` shots in a row.
+   - Alternate: `establishing (full-body)` → `close-up` → `diagonal action-lunge` → `eyes-only` → `full-bleed power-awakening`.
+3. **Tail Targeting:**
+   - Always point `tail.target` near the speaker's mouth/head (e.g., if `character_figure` is at `x: 45, y: 98` in `bust`, head center is around `x: 45, y: 42`).
+4. **Contrast First:**
+   - On dark themes (`cyberpunk-neon`, `solo-system`, `dark-fantasy`), keep protagonist dialogue crisp and reserve dark/glowing bubbles (`telepathy`, `system_window`, `narration`) for ancient voices, system prompts, or narration.

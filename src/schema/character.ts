@@ -21,8 +21,38 @@ export const SilhouettePresetSchema = z.enum([
   'casual-student',
   'suit-detective',
   'martial-artist',
+  'primitive-hunter',
   'shadow-entity',
   'none',
+]);
+
+export const EyeStyleSchema = z.enum([
+  'standard-anime',
+  'sharp-hunter',
+  'mystic-glow',
+  'villain-narrow',
+  'soft-shojo',
+]);
+
+export const HairStylePresetSchema = z.enum([
+  'auto',
+  'spiky-manhwa',
+  'wild-primitive',
+  'undercut-sleek',
+  'ponytail-ronin',
+  'long-flowing',
+  'hooded-shadow',
+]);
+
+export const CharacterAccessorySchema = z.enum([
+  'scar-eye',
+  'tribal-marks',
+  'headband',
+  'earring',
+  'fur-collar',
+  'bone-necklace',
+  'cyber-visor',
+  'cloak-clasp',
 ]);
 
 export const CharacterPaletteSchema = z.object({
@@ -51,11 +81,17 @@ export const CharacterSchema = z.object({
   role: CharacterRoleSchema.default('supporting'),
   palette: CharacterPaletteSchema.prefault({}),
   silhouettePreset: SilhouettePresetSchema.default('none'),
+  eyeStyle: EyeStyleSchema.default('sharp-hunter'),
+  hairStyle: HairStylePresetSchema.default('auto'),
+  accessories: z.array(CharacterAccessorySchema).default([]),
   bubbleTheme: CharacterBubbleThemeSchema.optional(),
 });
 
 export type CharacterRole = z.infer<typeof CharacterRoleSchema>;
 export type SilhouettePreset = z.infer<typeof SilhouettePresetSchema>;
+export type EyeStyle = z.infer<typeof EyeStyleSchema>;
+export type HairStylePreset = z.infer<typeof HairStylePresetSchema>;
+export type CharacterAccessory = z.infer<typeof CharacterAccessorySchema>;
 export type CharacterPalette = z.infer<typeof CharacterPaletteSchema>;
 export type CharacterBubbleTheme = z.infer<typeof CharacterBubbleThemeSchema>;
 export type Character = z.infer<typeof CharacterSchema>;
