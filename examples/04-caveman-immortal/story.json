@@ -1,0 +1,464 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "O Último Fogo de Kael",
+  "episodeNumber": 1,
+  "author": "ToonCraft AI Director",
+  "genre": "Dark Fantasy",
+  "synopsis": "Em 10.000 a.C., Kael, um caçador das cavernas, bebe de um fogo celestial para salvar sua irmã Lira — e descobre que a imortalidade é uma prisão onde todos ao redor viram cinzas.",
+  "theme": "dark-fantasy",
+  "canvas": { "width": 800, "sliceMaxHeight": 1280 },
+  "narrativeArc": {
+    "emotionalAnchor": "Kael promete à irmã Lira que nunca a deixará morrer sozinha no frio",
+    "centralConflict": "O Espírito do Fogo oferece vida para Lira e a tribo, mas cobra de Kael o fim da própria morte",
+    "protagonistChoice": "Kael bebe o fogo celestial sem hesitar, selando sua carne na eternidade para comprar mais invernos para Lira",
+    "ironicCostOrTwist": "Imortal, Kael vê Lira envelhecer e morrer em seus braços enquanto o mundo inteiro muda — condenado a carregar o nome dela por milênios"
+  },
+  "cast": [
+    {
+      "id": "kael",
+      "name": "Kael",
+      "role": "protagonist",
+      "silhouettePreset": "primitive-hunter",
+      "eyeStyle": "sharp-hunter",
+      "hairStyle": "wild-primitive",
+      "accessories": ["tribal-marks", "bone-necklace", "fur-collar"],
+      "narrativeProfile": {
+        "coreGoal": "Proteger Lira e manter a última chama da tribo acesa",
+        "woundOrFlaw": "Teme mais a solidão de perder quem ama do que a própria morte",
+        "speechStyle": "Frases curtas e diretas, ligadas a osso, brasa e inverno"
+      },
+      "palette": {
+        "skin": "#D4A373",
+        "hair": "#3E2723",
+        "eyes": "#F59E0B",
+        "outfitPrimary": "#4A3222",
+        "outfitAccent": "#B45309",
+        "aura": "#FBBF24"
+      }
+    },
+    {
+      "id": "lira",
+      "name": "Lira",
+      "role": "supporting",
+      "silhouettePreset": "none",
+      "eyeStyle": "soft-shojo",
+      "hairStyle": "long-flowing",
+      "accessories": ["headband"],
+      "narrativeProfile": {
+        "coreGoal": "Que Kael sobreviva ao inverno, mesmo quando ela não puder mais acompanhá-lo",
+        "woundOrFlaw": "Pulmões frágeis consumidos pelo frio da era glacial",
+        "speechStyle": "Sussurros serenos, cheios de memória e aceitação"
+      },
+      "palette": {
+        "skin": "#E7D5C4",
+        "hair": "#7B5E57",
+        "eyes": "#93C5FD",
+        "outfitPrimary": "#78716C",
+        "outfitAccent": "#EAB308",
+        "aura": "#FDE047"
+      }
+    },
+    {
+      "id": "spirit",
+      "name": "Espírito do Fogo",
+      "role": "antagonist",
+      "silhouettePreset": "shadow-entity",
+      "eyeStyle": "villain-narrow",
+      "hairStyle": "auto",
+      "accessories": [],
+      "narrativeProfile": {
+        "coreGoal": "Forjar um testemunho imortal que compreenda a crueldade do tempo",
+        "woundOrFlaw": "Incapaz de entender por que mortais valorizam aquilo que acaba",
+        "speechStyle": "Voz dupla entre sussurro e trovão, solene e implacável"
+      },
+      "palette": {
+        "skin": "#07060C",
+        "hair": "#07060C",
+        "eyes": "#EF4444",
+        "outfitPrimary": "#07060C",
+        "outfitAccent": "#B91C1C",
+        "aura": "#EF4444"
+      }
+    }
+  ],
+  "panels": [
+    {
+      "id": "p1-cave-winter",
+      "height": 740,
+      "camera": "establishing",
+      "moodDescription": "Caverna gelada ao anoitecer; Kael guarda a entrada enquanto Lira treme junto às últimas brasas.",
+      "narrativeBeat": "hook",
+      "subtextNote": "O frio não apaga só a fogueira — apaga o futuro. Lira sabe que não passa desta noite.",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 6 },
+      "pacingAfter": "normal",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#0F172A", "#1E293B", "#0B0C10"], "angleDeg": 180 },
+        { "type": "environment", "preset": "dark-forest", "perspectiveY": 62, "accentColor": "#94A3B8", "fogOpacity": 0.45 },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "waist-up",
+          "pose": "standing",
+          "expression": "determined",
+          "position": { "x": 28, "y": 90 },
+          "scale": 0.84,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "lira",
+          "framing": "waist-up",
+          "pose": "crouching",
+          "expression": "pain",
+          "position": { "x": 74, "y": 92 },
+          "scale": 0.6,
+          "rimLightColor": "#FDE047",
+          "lightDirection": "left",
+          "shadingIntensity": "standard",
+          "detailOverlaySvg": "<path d=\"M-6 -496 Q-18 -490 -24 -498\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-opacity=\"0.55\"/><path d=\"M-4 -492 Q-14 -482 -20 -488\" fill=\"none\" stroke=\"#CBD5E1\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-opacity=\"0.35\"/>",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "embers", "color": "#FBBF24", "intensity": 0.45 }
+      ],
+      "bubbles": [
+        {
+          "id": "b1",
+          "characterId": "kael",
+          "type": "speech",
+          "text": "O fogo não morre. Enquanto eu estiver aqui, você não morre.",
+          "position": { "x": 58, "y": 17 },
+          "tailTarget": { "x": 34, "y": 31 },
+          "maxWidth": 265,
+          "fontSize": 18
+        },
+        {
+          "id": "b2",
+          "characterId": "lira",
+          "type": "whisper",
+          "text": "Prometa que lembrará do meu nome, Kael.",
+          "position": { "x": 58, "y": 46 },
+          "tailTarget": { "x": 71, "y": 56 },
+          "maxWidth": 240,
+          "fontSize": 17
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p2-spirit-appears",
+      "height": 680,
+      "camera": "dutch-angle",
+      "moodDescription": "Uma fenda carmesim rasga a rocha; o Espírito do Fogo emerge diante de um Kael atônito.",
+      "narrativeBeat": "catalyst",
+      "subtextNote": "O pacto parece salvação, mas esconde uma sentença perpétua.",
+      "frame": { "type": "shattered", "borderWidth": 6, "skewDeg": -10 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#7F1D1D", "#0B0C10"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "spirit",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "position": { "x": 62, "y": 82 },
+          "scale": 0.78,
+          "rimLightColor": "#EF4444",
+          "lightDirection": "bottom-fire",
+          "shadingIntensity": "dramatic-noir",
+          "glowEyes": true,
+          "auraIntensity": 0.75,
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "waist-up",
+          "pose": "dramatic-profile",
+          "expression": "shocked",
+          "position": { "x": 22, "y": 93 },
+          "scale": 0.72,
+          "rimLightColor": "#EF4444",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "impact-flash", "color": "#EF4444", "intensity": 0.45 }
+      ],
+      "bubbles": [
+        {
+          "id": "b3",
+          "characterId": "spirit",
+          "type": "speech",
+          "text": "Beba a brasa, caçador. Sua irmã vive. Sua tribo vive. Mas você… não morrerá mais nunca.",
+          "position": { "x": 34, "y": 22 },
+          "tailTarget": { "x": 57, "y": 29 },
+          "maxWidth": 310,
+          "fontSize": 18
+        },
+        {
+          "id": "b4",
+          "characterId": "kael",
+          "type": "speech",
+          "text": "Qual é o preço?",
+          "position": { "x": 30, "y": 82 },
+          "tailTarget": { "x": 25, "y": 58 },
+          "maxWidth": 185,
+          "fontSize": 18
+        }
+      ],
+      "sfx": [
+        { "id": "sfx1", "text": "KRAK!", "style": "impact", "position": { "x": 82, "y": 15 }, "fontSize": 52, "primaryColor": "#FCA5A5", "strokeColor": "#7F1D1D" }
+      ]
+    },
+    {
+      "id": "p3-kael-drinks-fire",
+      "height": 540,
+      "camera": "extreme-close-up",
+      "moodDescription": "Kael aceita o cálice de brasa líquida; seus olhos acendem em âmbar imortal enquanto o calor rasga a escuridão.",
+      "narrativeBeat": "climax-choice",
+      "subtextNote": "Ele não hesita por um segundo: prefere pagar qualquer eternidade do que perder Lira hoje.",
+      "frame": { "type": "shattered", "borderWidth": 5 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#B45309", "#450A0A", "#09090B"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "eyes-only",
+          "pose": "power-awakening",
+          "expression": "determined",
+          "position": { "x": 50, "y": 72 },
+          "scale": 1.05,
+          "rimLightColor": "#FBBF24",
+          "lightDirection": "bottom-fire",
+          "shadingIntensity": "dramatic-noir",
+          "glowEyes": true,
+          "auraIntensity": 0.9,
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#FBBF24", "intensity": 0.65 },
+        { "type": "effect", "kind": "embers", "color": "#FEF08A", "intensity": 0.7 }
+      ],
+      "bubbles": [
+        {
+          "id": "b5",
+          "characterId": "kael",
+          "type": "shout",
+          "text": "QUE VENHA A ETERNIDADE!",
+          "position": { "x": 50, "y": 82 },
+          "tailTarget": { "x": 50, "y": 64 },
+          "maxWidth": 310,
+          "fontSize": 20
+        }
+      ],
+      "sfx": [
+        { "id": "sfx2", "text": "FWOOSH!", "style": "glow", "position": { "x": 22, "y": 18 }, "fontSize": 46, "primaryColor": "#FEF08A", "strokeColor": "#92400E" }
+      ]
+    },
+    {
+      "id": "p4-lira-ages",
+      "height": 740,
+      "camera": "close-up",
+      "moodDescription": "Décadas depois. Lira, agora com mechas grisalhas e marcas do tempo, sorri com doçura ao lado de um Kael que nunca mudou.",
+      "narrativeBeat": "character-bond",
+      "subtextNote": "Cada ruga de Lira prova que o pacto funcionou — e prova que Kael ficará para trás.",
+      "frame": { "type": "inset", "borderWidth": 3, "cornerRadius": 18 },
+      "pacingAfter": "breath",
+      "memoryTint": "sepia-flashback",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#78350F", "#451A03", "#1C1917"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "lira",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "smirk",
+          "position": { "x": 31, "y": 90 },
+          "scale": 0.76,
+          "rimLightColor": "#EAB308",
+          "lightDirection": "left",
+          "shadingIntensity": "standard",
+          "detailOverlaySvg": "<path d=\"M-22 -522 Q-16 -518 -10 -521\" fill=\"none\" stroke=\"#78716C\" stroke-width=\"1.4\" stroke-linecap=\"round\"/><path d=\"M10 -521 Q16 -518 22 -522\" fill=\"none\" stroke=\"#78716C\" stroke-width=\"1.4\" stroke-linecap=\"round\"/><path d=\"M-44 -555 L-38 -490 L-32 -492 L-36 -555 Z\" fill=\"#D6D3D1\" fill-opacity=\"0.65\"/><path d=\"M36 -555 L32 -492 L38 -490 L44 -555 Z\" fill=\"#D6D3D1\" fill-opacity=\"0.65\"/>",
+          "zIndex": 22
+        },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "shadowed",
+          "position": { "x": 70, "y": 90 },
+          "scale": 0.76,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "left",
+          "shadingIntensity": "standard",
+          "zIndex": 20
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b6",
+          "characterId": "lira",
+          "type": "speech",
+          "text": "Você continua igual, Kael. Como a primeira neve.",
+          "position": { "x": 30, "y": 17 },
+          "tailTarget": { "x": 31, "y": 39 },
+          "maxWidth": 260,
+          "fontSize": 18
+        },
+        {
+          "id": "b7",
+          "characterId": "kael",
+          "type": "speech",
+          "text": "Eu sinto cada ano seu, Lira. Como se fosse meu.",
+          "position": { "x": 68, "y": 84 },
+          "tailTarget": { "x": 70, "y": 60 },
+          "maxWidth": 260,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p5-liras-passing",
+      "height": 720,
+      "camera": "close-up",
+      "moodDescription": "O último suspiro de Lira se dissolve no ar gelado. Kael chora em silêncio — jovem, intacto, e completamente só.",
+      "narrativeBeat": "tragic-twist",
+      "subtextNote": "A verdadeira maldição nunca foi viver para sempre, mas sobreviver a todos que o amaram.",
+      "frame": { "type": "standard", "borderWidth": 3, "cornerRadius": 4 },
+      "pacingAfter": "dramatic_pause",
+      "memoryTint": "frost-despair",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#0F172A", "#020617"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "pain",
+          "position": { "x": 50, "y": 88 },
+          "scale": 0.88,
+          "rimLightColor": "#93C5FD",
+          "lightDirection": "top",
+          "shadingIntensity": "heavy",
+          "detailOverlaySvg": "<path d=\"M-14 -450 L0 -462 L14 -450 L0 -438 Z\" fill=\"#F59E0B\" fill-opacity=\"0.35\" stroke=\"#FBBF24\" stroke-width=\"1.2\"/>",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "mana-particles", "color": "#BAE6FD", "intensity": 0.45 }
+      ],
+      "bubbles": [
+        {
+          "id": "b8",
+          "characterId": "lira",
+          "type": "whisper",
+          "text": "Viva. Por mim. Por todos que não puderam.",
+          "position": { "x": 27, "y": 17 },
+          "maxWidth": 240,
+          "fontSize": 17
+        },
+        {
+          "id": "b9",
+          "characterId": "kael",
+          "type": "shout",
+          "text": "NÃO ME DEIXE SOZINHO!",
+          "position": { "x": 66, "y": 84 },
+          "tailTarget": { "x": 52, "y": 54 },
+          "maxWidth": 250,
+          "fontSize": 19
+        }
+      ],
+      "sfx": [
+        { "id": "sfx3", "text": "SHHH...", "style": "ambient", "position": { "x": 78, "y": 20 }, "fontSize": 36, "primaryColor": "#BAE6FD", "strokeColor": "#1E3A8A" }
+      ]
+    },
+    {
+      "id": "p6-centuries-pass",
+      "height": 700,
+      "camera": "medium",
+      "moodDescription": "Milênios depois. O mundo ergueu torres de aço e néon sob a chuva — e Kael ainda caminha entre as eras com a mesma cicatriz.",
+      "narrativeBeat": "conflict-escalation",
+      "subtextNote": "As cavernas viraram arranha-céus, as fogueiras viraram letreiros, mas o luto de Kael não envelheceu um dia.",
+      "frame": { "type": "standard", "borderWidth": 3, "cornerRadius": 6 },
+      "pacingAfter": "scene_transition",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#0F172A", "#1E1B4B"], "angleDeg": 180 },
+        { "type": "environment", "preset": "rainy-street", "perspectiveY": 65, "accentColor": "#38BDF8", "fogOpacity": 0.35 },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "waist-up",
+          "pose": "dramatic-profile",
+          "expression": "shadowed",
+          "position": { "x": 34, "y": 90 },
+          "scale": 0.82,
+          "rimLightColor": "#38BDF8",
+          "lightDirection": "right",
+          "shadingIntensity": "dramatic-noir",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "rain", "color": "#BAE6FD", "intensity": 0.65 }
+      ],
+      "bubbles": [
+        {
+          "id": "b10",
+          "characterId": "kael",
+          "type": "narration",
+          "text": "Impérios ergueram-se em pedra, depois em vidro. Eu vi todos caírem sob a mesma chuva.",
+          "position": { "x": 62, "y": 18 },
+          "maxWidth": 330,
+          "fontSize": 18,
+          "style": { "fillColor": "#0B0C10", "strokeColor": "#38BDF8", "textColor": "#E0F2FE" }
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p7-eternal-walk",
+      "height": 860,
+      "camera": "wide",
+      "moodDescription": "Longe das luzes da cidade, sob a lua cheia da floresta antiga, Kael segura sua lança de pedra — guardião solitário de uma promessa eterna.",
+      "narrativeBeat": "cliffhanger",
+      "subtextNote": "Enquanto ele lembrar o nome dela, Lira nunca morreu de verdade — e a caçada dele nunca termina.",
+      "frame": { "type": "full-bleed", "borderWidth": 0 },
+      "pacingAfter": "dramatic_pause",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#1E1B4B", "#0F172A"], "angleDeg": 180 },
+        { "type": "environment", "preset": "dark-forest", "perspectiveY": 70, "accentColor": "#94A3B8", "fogOpacity": 0.5 },
+        {
+          "type": "character_figure",
+          "characterId": "kael",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "determined",
+          "position": { "x": 50, "y": 90 },
+          "scale": 0.72,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "top",
+          "shadingIntensity": "dramatic-noir",
+          "weaponProp": "stone-spear",
+          "auraIntensity": 0.35,
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "embers", "color": "#FBBF24", "intensity": 0.4 }
+      ],
+      "bubbles": [
+        {
+          "id": "b11",
+          "characterId": "kael",
+          "type": "narration",
+          "text": "Lembre do meu nome, Lira. Pois eu nunca poderei esquecer o seu.",
+          "position": { "x": 50, "y": 12 },
+          "maxWidth": 360,
+          "fontSize": 20,
+          "style": { "fillColor": "#0B0C10", "strokeColor": "#F59E0B", "textColor": "#FBBF24" }
+        }
+      ],
+      "sfx": []
+    }
+  ]
+}
