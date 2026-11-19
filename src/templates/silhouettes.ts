@@ -60,6 +60,10 @@ interface Part {
   attrs?: Record<string, string | number | undefined>;
   /** Skip the ink outline. */
   noStroke?: boolean;
+  /** Override stroke color (detail lines drawn on top, e.g. finger grooves). */
+  stroke?: string;
+  /** Stroke width used when `stroke` is set (local units). */
+  strokeWidth?: number;
 }
 
 /** Local-space crop per framing: [top, bottom] and fraction of panel height to fill. */
@@ -127,8 +131,8 @@ function skeletonFor(pose: Pose): Skeleton {
       return {
         hip: { x: 0, y: REF_HIP_Y },
         lean: 2,
-        armBack: [{ x: -52, y: -452 }, { x: -60, y: -345 }, { x: -58, y: -248 }],
-        armFront: [{ x: 52, y: -452 }, { x: 64, y: -345 }, { x: 70, y: -248 }],
+        armBack: [{ x: -52, y: -452 }, { x: -72, y: -348 }, { x: -56, y: -246 }],
+        armFront: [{ x: 52, y: -452 }, { x: 72, y: -348 }, { x: 56, y: -246 }],
         legBack: [{ x: -22, y: REF_HIP_Y }, { x: -24, y: -135 }, { x: -26, y: -14 }],
         legFront: [{ x: 22, y: REF_HIP_Y }, { x: 26, y: -135 }, { x: 30, y: -14 }],
         backArmBehind: true,
@@ -140,8 +144,9 @@ function skeletonFor(pose: Pose): Skeleton {
       return {
         hip: { x: 0, y: REF_HIP_Y },
         lean: 0,
-        armBack: [{ x: -76, y: -452 }, { x: -94, y: -345 }, { x: -98, y: -246 }],
-        armFront: [{ x: 76, y: -452 }, { x: 94, y: -345 }, { x: 98, y: -246 }],
+        // Natural A-pose: elbows bow slightly outward, fists rest beside the hips.
+        armBack: [{ x: -76, y: -452 }, { x: -98, y: -348 }, { x: -80, y: -246 }],
+        armFront: [{ x: 76, y: -452 }, { x: 98, y: -348 }, { x: 80, y: -246 }],
         legBack: [{ x: -30, y: REF_HIP_Y }, { x: -34, y: -135 }, { x: -38, y: -14 }],
         legFront: [{ x: 30, y: REF_HIP_Y }, { x: 34, y: -135 }, { x: 38, y: -14 }],
         backArmBehind: false,
@@ -181,16 +186,64 @@ function limbPath(pts: P[], widths: number[]): string {
   return d;
 }
 
-/** Sculpted polygonal hand/fist with thumb ridge instead of a flat circle. */
+/** Outward tilt (deg) applied to every fist so hanging hands angle away from the body. */
+const HAND_TILT_DEG = -12;
+
+/** Mirror + rotate a local hand-space point around the wrist center. */
+function handPoint(local: P, c: P, r: number, side: number, tiltDeg: number = HAND_TILT_DEG): P {
+  const a = (tiltDeg * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  return {
+    x: c.x + side * (local.x * cos - local.y * sin) * r,
+    y: c.y + (local.x * sin + local.y * cos) * r,
+  };
+}
+
+/**
+ * Stylized closed fist: palm mass, thumb capsule on the inner side and two
+ * knuckle grooves at the bottom — sculpted enough to still read as a hand at
+ * small render scales (the previous hexagon blob collapsed into a ball).
+ */
 function sculptedHandPath(c: P, r: number, side: number): string {
-  return poly([
-    { x: c.x - side * r * 0.85, y: c.y - r * 0.7 },
-    { x: c.x + side * r * 0.9, y: c.y - r * 0.65 },
-    { x: c.x + side * r * 1.15, y: c.y + r * 0.15 },
-    { x: c.x + side * r * 0.75, y: c.y + r * 0.95 },
-    { x: c.x - side * r * 0.65, y: c.y + r * 0.85 },
-    { x: c.x - side * r * 1.05, y: c.y + r * 0.1 },
-  ]);
+  const outline: P[] = [
+    { x: -0.78, y: -1.02 }, // wrist (back of hand)
+    { x: 0.62, y: -0.98 }, // knuckle ridge
+    { x: 1.08, y: -0.3 }, // fingertip (back edge)
+    { x: 1.02, y: 0.58 }, // fingertip (front edge)
+    { x: 0.42, y: 0.34 }, // groove between fingers
+    { x: 0.08, y: 0.92 }, // palm-base groove
+    { x: -0.5, y: 0.62 }, // heel
+    { x: -0.88, y: -0.12 }, // thumb base (inner side)
+    { x: -1.22, y: -0.5 }, // thumb tip
+    { x: -1.02, y: -0.8 }, // thumb base (upper)
+  ];
+  return poly(outline.map((p) => handPoint(p, c, r, side)));
+}
+
+/** Finger/knuckle grooves stroked over the fist (never receives rim/shade passes). */
+function handDetailPath(c: P, r: number, side: number): string {
+  const lines: P[][] = [
+    [
+      { x: -0.55, y: 0.5 },
+      { x: 0.78, y: 0.42 },
+    ], // groove across the fingers
+    [
+      { x: -0.3, y: 0.05 },
+      { x: 0.95, y: -0.02 },
+    ], // secondary groove
+    [
+      { x: -0.6, y: -0.82 },
+      { x: 0.95, y: -0.62 },
+    ], // knuckle ridge line
+  ];
+  return lines
+    .map((line) => {
+      const p1 = handPoint(line[0]!, c, r, side);
+      const p2 = handPoint(line[1]!, c, r, side);
+      return `M${fmt(p1.x)} ${fmt(p1.y)}L${fmt(p2.x)} ${fmt(p2.y)}`;
+    })
+    .join('');
 }
 
 const ellipsePath = (c: P, rx: number, ry: number) =>
@@ -331,7 +384,7 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   const upperFront: Part[] = [];
 
   // Legs.
-  const legW = outfit.gi ? [54, 46, 34] : [46, 36, 25];
+  const legW = outfit.gi ? [54, 46, 34] : [46, 36, 22];
   if (!outfit.robe) {
     legParts.push({ d: limbPath(sk.legBack, legW), fill: darken(pants, 0.14) });
     legParts.push({ d: limbPath(sk.legFront, legW), fill: pants });
@@ -430,41 +483,66 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   }
 
   // Arms.
-  const armW = outfit.robe ? [34, 36, 40] : outfit.armor ? [36, 32, 28] : [29, 25, 20];
+  const armW = outfit.robe ? [35, 36, 22] : outfit.armor ? [38, 33, 20] : [30, 26, 14];
   const sleeveColor = outfit.gi ? lighten(outfitMain, 0.05) : outfitMain;
   const armPart = (arm: [P, P, P], shade: number, side: number): Part[] => {
     const parts: Part[] = [];
+    // Wrist point: the forearm tapers to a thin wrist just before the fist, so
+    // the hand reads as a hand instead of a ball stuck on a tube.
+    const wrist = lerp(arm[1], arm[2], 0.9);
     if (outfit.primitive) {
       // Bare muscular arms with leather bracers/wraps on forearms
-      parts.push({ d: limbPath([arm[0], arm[1], arm[2]], [30, 26, 20]), fill: darken(skin, shade) });
+      parts.push({ d: limbPath([arm[0], arm[1], wrist], [32, 27, 15]), fill: darken(skin, shade) });
+      // Deltoid cap so the arm grows out of the shoulder instead of a pinned-on tube.
+      parts.push({ d: ellipsePath(arm[0], 19, 13.5), fill: darken(skin, shade) });
       const wrapStart = lerp(arm[1], arm[2], 0.25);
       const wrapEnd = lerp(arm[1], arm[2], 0.88);
       parts.push({ d: limbPath([wrapStart, wrapEnd], [26, 21]), fill: darken(outfitMain, shade + 0.15) });
       parts.push({ d: sculptedHandPath(arm[2], 12.5, side), fill: darken(skin, shade) });
+      parts.push({
+        d: handDetailPath(arm[2], 12.5, side),
+        fill: 'none',
+        stroke: darken(skin, 0.5),
+        strokeWidth: 1.5,
+        body: false,
+      });
       return parts;
     }
+    // Bare skin limb underneath: the sleeve/cowl covers most of it and leaves a
+    // real wrist segment visible between sleeve end and fist.
+    parts.push({ d: limbPath([arm[0], arm[1], wrist], [30, 26, 14]), fill: darken(skin, shade) });
+    // Deltoid cap (sleeve color) merges the arm root into the torso silhouette.
+    const capRx = (armW[0] ?? 30) / 2 + 3.5;
+    parts.push({ d: ellipsePath(arm[0], capRx, capRx * 0.74), fill: darken(sleeveColor, shade) });
     const sleeveEnd = outfit.gi
       ? lerp(arm[1], arm[2], 0.15)
       : outfit.robe
         ? lerp(arm[1], arm[2], 0.85)
-        : lerp(arm[1], arm[2], 0.82);
-    if (outfit.gi) {
-      parts.push({ d: limbPath([arm[1], arm[2]], [23, 19]), fill: darken(skin, shade) });
-    }
+        : lerp(arm[1], arm[2], 0.78);
     parts.push({ d: limbPath([arm[0], arm[1], sleeveEnd], armW), fill: darken(sleeveColor, shade) });
+    const handR = outfit.armor ? 14 : 12.5;
     parts.push({
-      d: sculptedHandPath(arm[2], outfit.armor ? 15 : 12.5, side),
+      d: sculptedHandPath(arm[2], handR, side),
       fill: outfit.armor ? darken(lighten(outfitMain, 0.25), shade) : darken(skin, shade),
     });
+    if (!outfit.armor) {
+      parts.push({
+        d: handDetailPath(arm[2], handR, side),
+        fill: 'none',
+        stroke: darken(skin, 0.5),
+        strokeWidth: 1.5,
+        body: false,
+      });
+    }
     if (outfit.armor) {
       parts.push({
-        d: limbPath([lerp(arm[1], arm[2], 0.3), lerp(arm[1], arm[2], 0.85)], [30, 26]),
+        d: limbPath([lerp(arm[1], arm[2], 0.3), lerp(arm[1], arm[2], 0.85)], [30, 22]),
         fill: darken(lighten(outfitMain, 0.3), shade),
       });
     }
     if (outfit.neonLines) {
       parts.push({
-        d: limbPath([lerp(arm[0], arm[1], 0.2), arm[1], lerp(arm[1], arm[2], 0.7)], [4, 4, 4]),
+        d: limbPath([lerp(arm[0], arm[1], 0.2), arm[1], lerp(arm[1], arm[2], 0.88)], [4, 4, 4]),
         fill: accent,
         noStroke: true,
         body: false,
@@ -654,12 +732,14 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     parts
       .map((p) => {
         const neon = p.attrs?.['data-neon'] !== undefined;
+        const isDetailLine = p.fill === 'none' && p.stroke !== undefined;
         return el('path', {
           d: p.d,
           fill: p.fill,
-          stroke: p.noStroke ? undefined : ink,
-          'stroke-width': p.noStroke ? undefined : lw,
+          stroke: p.noStroke ? undefined : (p.stroke ?? ink),
+          'stroke-width': p.noStroke ? undefined : (p.stroke ? (p.strokeWidth ?? 1.4) : lw),
           'stroke-linejoin': 'round',
+          'stroke-linecap': isDetailLine ? 'round' : undefined,
           filter: neon ? `url(#${neonId})` : undefined,
         });
       })
