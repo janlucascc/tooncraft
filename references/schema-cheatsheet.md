@@ -11,6 +11,7 @@ Quick reference of every enum, constraint and default enforced by `src/schema/`.
 - `author`: string (default `"ToonCraft AI Director"`)
 - `genre`: string (default `"Action"`)
 - `synopsis`: optional string (<= 500 chars)
+- `narrativeArc`: optional `{ emotionalAnchor: string (<=260), centralConflict: string (<=260), protagonistChoice: string (<=260), ironicCostOrTwist: string (<=260) }` *(Pass-1 Writer's Room requirement)*
 - `theme`: `"cyberpunk-neon"` | `"dark-fantasy"` | `"solo-system"` | `"slice-of-life-pastel"` | `"noir-thriller"` | `"action-shonen"` | `"custom"`
 - `canvas`: `{ width: 400..1600 (800), backgroundColor?: Color, defaultMarginX: 0..120 (24), sliceMaxHeight: 600..2000 (1280), fontPreset?: "comic" | "modern" | "system" | "dramatic" }`
 - `cast`: `Character[]`
@@ -24,6 +25,7 @@ Quick reference of every enum, constraint and default enforced by `src/schema/`.
 - `eyeStyle`: `"standard-anime"` | `"sharp-hunter"` (default) | `"mystic-glow"` | `"villain-narrow"` | `"soft-shojo"`
 - `hairStyle`: `"auto"` (default) | `"spiky-manhwa"` | `"wild-primitive"` | `"undercut-sleek"` | `"ponytail-ronin"` | `"long-flowing"` | `"hooded-shadow"`
 - `accessories`: array of `"scar-eye"` | `"tribal-marks"` | `"headband"` | `"earring"` | `"fur-collar"` | `"bone-necklace"` | `"cyber-visor"` | `"cloak-clasp"`
+- `narrativeProfile`: optional `{ coreGoal?: string (<=200), woundOrFlaw?: string (<=200), speechStyle?: string (<=200) }`
 - `palette`: `{ skin, hair, eyes, outfitPrimary, outfitAccent, aura }` (all `Color`)
 - `bubbleTheme`: optional `{ fillColor?, strokeColor?, textColor?, glowColor? }`
 
@@ -32,6 +34,9 @@ Quick reference of every enum, constraint and default enforced by `src/schema/`.
 - `height`: int `200..2200` (**required**)
 - `camera`: `"extreme-close-up"` | `"close-up"` | `"medium"` | `"wide"` | `"establishing"` | `"dutch-angle"` | `"birds-eye"` | `"low-angle"`
 - `moodDescription`: optional string (<= 300 chars)
+- `narrativeBeat`: optional `"hook"` | `"character-bond"` | `"conflict-escalation"` | `"flashback-memory"` | `"catalyst"` | `"moral-dilemma"` | `"climax-choice"` | `"tragic-twist"` | `"cliffhanger"`
+- `subtextNote`: optional string (<= 300 chars)
+- `memoryTint`: `"none"` (default) | `"sepia-flashback"` | `"crimson-trauma"` | `"frost-despair"`
 - `frame`: `{ type, borderColor?, borderWidth: 0..16 (4), marginX?: 0..160, skewDeg: -20..20 (6), cornerRadius: 0..40 (0) }`
   - `frame.type`: `"standard"` | `"full-bleed"` | `"diagonal-top"` | `"diagonal-bottom"` | `"diagonal-both"` | `"borderless"` | `"shattered"` | `"inset"`
 - `layers`: `VisualLayer[]` (min 1, **required**)

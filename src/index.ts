@@ -39,6 +39,11 @@ export {
   type ImageFormat,
   type SliceRange,
 } from './engine/image-exporter.js';
+export {
+  analyzeEpisodeNarrative,
+  type NarrativeAnalysisReport,
+  type NarrativeMetrics,
+} from './engine/narrative-analyzer.js';
 export { sanitizeSvgMarkup, ALLOWED_TAGS, type SanitizeOptions, type SanitizeResult } from './components/scenes/svg-sanitizer.js';
 export {
   FONT_FACES,

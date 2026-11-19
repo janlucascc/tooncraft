@@ -1,6 +1,7 @@
 import { Resvg } from '@resvg/resvg-js';
 import { describe, expect, it } from 'vitest';
 import { composeEpisode } from '../src/engine/composer.js';
+import { analyzeEpisodeNarrative } from '../src/engine/narrative-analyzer.js';
 import { validateEpisode } from '../src/schema/index.js';
 
 describe('high-fidelity anime/manhwa character engine & Pass-2 detail features', () => {
@@ -94,5 +95,77 @@ describe('high-fidelity anime/manhwa character engine & Pass-2 detail features',
       const rendered = new Resvg(p.svg).render();
       expect(rendered.width).toBe(800);
     }
+  });
+
+  it('scores narrative depth, flashback memoryTint, and dialogue friction via analyzeEpisodeNarrative', () => {
+    const richEpisode = validateEpisode({
+      title: 'Blood of the White Frost',
+      theme: 'dark-fantasy',
+      narrativeArc: {
+        emotionalAnchor: 'Save younger brother Kori from frost-lung',
+        centralConflict: 'Chief Brak orders the clan to abandon the dying boy',
+        protagonistChoice: 'Taru accepts the Solar Heart curse to steal eternal fire',
+        ironicCostOrTwist: 'He sleeps 3,000 years during the metamorphosis',
+      },
+      cast: [
+        {
+          id: 'taru',
+          name: 'Taru',
+          role: 'protagonist',
+          silhouettePreset: 'primitive-hunter',
+          narrativeProfile: {
+            coreGoal: 'Bring fire back to Kori',
+            woundOrFlaw: 'Refuses to abandon blood-kin',
+            speechStyle: 'Short primal metaphors of bone, ember and frost',
+          },
+        },
+        {
+          id: 'brak',
+          name: 'Chefe Brak',
+          role: 'supporting',
+          silhouettePreset: 'primitive-hunter',
+          narrativeProfile: {
+            coreGoal: 'Save the healthy hunters of the clan',
+            woundOrFlaw: 'Hardened by thirty winters of famine',
+            speechStyle: 'Cold tribal proverbs',
+          },
+        },
+      ],
+      panels: [
+        {
+          id: 'p1',
+          height: 520,
+          narrativeBeat: 'conflict-escalation',
+          subtextNote: 'Brak masks his guilt behind ruthless survival law',
+          layers: [{ type: 'backdrop', kind: 'solid', colors: ['#080A12'] }],
+          bubbles: [
+            { id: 'b1', characterId: 'brak', type: 'speech', text: 'Leave the boy, Taru.', position: { x: 30, y: 20 } },
+            { id: 'b2', characterId: 'taru', type: 'speech', text: 'Then walk without me.', position: { x: 70, y: 60 } },
+          ],
+        },
+        {
+          id: 'p2',
+          height: 500,
+          narrativeBeat: 'flashback-memory',
+          subtextNote: 'Taru remembers his oath to Kori before the last ember died',
+          memoryTint: 'sepia-flashback',
+          layers: [{ type: 'backdrop', kind: 'solid', colors: ['#1A120B'] }],
+          bubbles: [
+            { id: 'b3', characterId: 'taru', type: 'thought', text: 'Hold on until I return.', position: { x: 40, y: 30 } },
+            { id: 'b4', characterId: 'taru', type: 'speech', text: 'I swear on our father’s flint.', position: { x: 65, y: 70 } },
+          ],
+        },
+      ],
+    });
+
+    expect(richEpisode.success).toBe(true);
+    if (!richEpisode.success) return;
+
+    const analysis = analyzeEpisodeNarrative(richEpisode.data, 1);
+    expect(analysis.score).toBeGreaterThanOrEqual(85);
+    expect(['S', 'A']).toContain(analysis.grade);
+
+    const composed = composeEpisode(richEpisode.data);
+    expect(composed.panels[1]!.svg).toContain('data-memory-tint="sepia-flashback"');
   });
 });

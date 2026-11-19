@@ -8,71 +8,81 @@ description: >-
   generative image models.
 ---
 
-# ToonCraft — Code-as-Webtoon Skill (Two-Pass High-Fidelity Edition)
+# ToonCraft — Code-as-Webtoon Skill (3-Pass Director Edition)
 
 Transform any story prompt, novel excerpt or scene idea into a production-ready
-**vertical-scroll Webtoon / Manhwa** (800px native width) rendered with deterministic
-high-density SVG, real glyph-measured lettering and smart-sliced PNG/WebP or standalone HTML5 output.
+**vertical-scroll Webtoon / Manhwa** (800px native width) with deep screenplay writing,
+subtext-rich dialogues, deterministic high-density anime SVG art, real glyph-measured
+lettering and smart-sliced PNG/WebP or standalone HTML5 output.
 
-> **Important Philosophy:** Because ToonCraft outputs static SVG slices rather than real-time 60fps animations, **render time is never a constraint**. Always maximize vector detail on every character and scene using the mandatory **Two-Pass Workflow** below.
-
----
-
-## Mandatory Two-Pass Workflow (Follow in Order)
-
-### Pass 1 — Storyboard, Pacing & Camera Layout
-1. **Direct the Episode Architecture**
-   - Pick a `theme` matching the tone (`cyberpunk-neon`, `dark-fantasy`, `solo-system`, `slice-of-life-pastel`, `noir-thriller`, `action-shonen`).
-   - Apply the **Manhwa 5-Beat Formula** from [references/webtoon-pacing-guide.md](./references/webtoon-pacing-guide.md):
-     *1. Visual Hook $\to$ 2. Painful Status Quo $\to$ 3. Catalyst Incident $\to$ 4. Visceral Climax/Awakening $\to$ 5. Impact Cliffhanger*.
-   - Alternate camera shots aggressively (`establishing` $\to$ `close-up` $\to$ `dutch-angle` $\to$ `extreme-close-up / eyes-only` $\to$ `full-bleed` splash). Never repeat two identical medium shots in a row.
-   - Write punchy, cascading dialogue: keep each bubble between **3 and 14 words**, splitting longer thoughts into 2–3 staggered vertical bubbles (`y: 15` $\to$ `y: 45` $\to$ `y: 78`).
-
-2. **Define the Cast Bible (`cast[]`)**
-   - Give every character an authentic `silhouettePreset` (`primitive-hunter`, `martial-artist`, `hooded-mage`, `armored-knight`, `cyber-assassin`, `casual-student`, `suit-detective`, `shadow-entity`).
-   - Configure `eyeStyle` (`sharp-hunter`, `mystic-glow`, `villain-narrow`, `standard-anime`, `soft-shojo`), `hairStyle` (`spiky-manhwa`, `wild-primitive`, `undercut-sleek`, `ponytail-ronin`, `long-flowing`), and `accessories` (`scar-eye`, `tribal-marks`, `headband`, `earring`, `fur-collar`, `bone-necklace`, `cyber-visor`, `cloak-clasp`).
+> **Core Philosophy:** Never treat a webtoon as a shallow slide-deck of 1-sentence captions. Because ToonCraft outputs static SVG slices (zero 60fps constraint), always combine **literary screenplay depth** with **maximum vector character detail** by executing the mandatory **Three-Pass Director Pipeline** below.
 
 ---
 
-### Pass 2 — High-Detail Character Polish Scan (Segunda Varredura)
-**Before rendering or delivering**, perform a dedicated **Second Pass** over every panel in `story.json` specifically to upgrade character aesthetics and visual storytelling (consult [references/anime-character-guide.md](./references/anime-character-guide.md)):
+## Mandatory Three-Pass Director Pipeline (Follow in Order)
 
-1. **Panel-by-Panel Character Lighting & Shading**
-   - Set `lightDirection` (`left`, `right`, `top`, `bottom-fire`, `back-rim`) on every `character_figure` to match the panel's primary light source (moonlight, meteor, fire, artifact, neon sign).
-   - Set `shadingIntensity` (`standard`, `heavy`, `dramatic-noir`) to match the emotional weight of the beat.
-   - Set an explicit `rimLightColor` so the character's silhouette pops sharply against the background.
+### Pass 1 — The Writer's Room: Plot, Character Psychology & Dialogue Engineering
+Consult [references/narrative-and-dialogue-guide.md](./references/narrative-and-dialogue-guide.md) before writing a single panel:
 
-2. **Micro-Expressions, Auras & Props**
-   - Upgrade generic `neutral` faces to expressive anime states: `determined`, `angry`, `shocked`, `pain`, `smirk`, `menacing-glow`, or `shadowed`.
-   - Attach built-in weapons via `weaponProp` (`stone-spear`, `katana`, `greatsword`, `dagger-dual`, `magic-orb`) where appropriate.
-   - Dial in `auraIntensity` (`0.3..1.0`) and `glowEyes: true` during power surges or climactic reveals.
+1. **Architect the Episode (`narrativeArc`)**
+   - Define `emotionalAnchor` (a specific named person, promise, or concrete human bond at stake — never an abstract cliché).
+   - Define `centralConflict` (clash of wills between at least 2 distinct characters/voices).
+   - Define `protagonistChoice` (the conscious bargain or sacrifice at the climax).
+   - Define `ironicCostOrTwist` (the tragic price paid or revelation that hooks the next episode).
 
-3. **Custom Local Detail Injection (`detailOverlaySvg` & `svg_raw`)**
-   - Inject panel-specific high-detail vector overlays on the character via `detailOverlaySvg` (drawn in character local coords where `(0, -535)` is head center and `(0, -415)` is chest center) — e.g., freezing breath vapor, glowing immortality veins, facial energy cracks, blood/sweat drops, or rune markings.
-   - Add foreground/background props via `svg_raw` (`0..800` × `0..panel.height`) — see [references/svg-composition-patterns.md](./references/svg-composition-patterns.md).
-   - Check [references/schema-cheatsheet.md](./references/schema-cheatsheet.md) for all enum values.
+2. **Build the Cast Psychology (`cast[].narrativeProfile`)**
+   - Include at least **2–3 cast members** (e.g. protagonist + human foil/elder/loved one + antagonist/cosmic entity) so scenes have real interpersonal dialogue friction.
+   - Give every character a `narrativeProfile` (`coreGoal`, `woundOrFlaw`, `speechStyle`) so their vocabulary and metaphors sound unmistakably distinct.
+
+3. **Engineer Scene Density & Subtext-Rich Dialogues**
+   - Pair medium panels (`480–560px` each) inside `1280px` page slices so a **5-page episode contains 8–10 rich panels** (combining 2-panel dialogue/flashback pages with tall `980–1120px` splash pages for the climax and cliffhanger).
+   - Include at least one flashback/trauma panel (`memoryTint: "sepia-flashback"`, `"crimson-trauma"`, or `"frost-despair"`).
+   - Annotate every panel with `narrativeBeat` and `subtextNote`.
+   - Chain **2 to 3 descending bubbles per panel** (Setup $\to$ Friction $\to$ Emotional Strike), keeping narration boxes $\le 30\%$ of total bubbles.
 
 ---
 
-### Validate, Inspect & Visual Verification
+### Pass 2 — Cinematography, Framing & Vertical Pacing
+Consult [references/webtoon-pacing-guide.md](./references/webtoon-pacing-guide.md) and [references/svg-composition-patterns.md](./references/svg-composition-patterns.md):
+
+1. **Aggressive Camera Alternation**
+   - Never stack three identical medium shots in a row. Alternate: `establishing` $\to$ `close-up` $\to$ `inset / flashback` $\to$ `dutch-angle` $\to$ `extreme-close-up / eyes-only` $\to$ `full-bleed` splash.
+2. **Gutter Rhythm (`pacingAfter`)**
+   - Use `tight` (`16px`) or `normal` (`64px`) between paired panels on the same page slice, and `breath` (`140px`) or `dramatic_pause` (`320px`) at major page transitions.
+
+---
+
+### Pass 3 — High-Detail Character Polish Scan (Varredura Visual dos Personagens)
+Consult [references/anime-character-guide.md](./references/anime-character-guide.md) and [references/schema-cheatsheet.md](./references/schema-cheatsheet.md):
+
+1. **Panel-by-Panel Lighting & Cel-Shading**
+   - Set `lightDirection` (`left`, `right`, `top`, `bottom-fire`, `back-rim`), `shadingIntensity` (`standard`, `heavy`, `dramatic-noir`), and `rimLightColor` on every `character_figure`.
+2. **Micro-Expressions, Auras, Accessories & Props**
+   - Use expressive states (`determined`, `angry`, `shocked`, `pain`, `smirk`, `menacing-glow`, `shadowed`), attach `weaponProp` (`stone-spear`, `katana`, `greatsword`, `dagger-dual`, `magic-orb`), and set `auraIntensity` / `glowEyes` during power surges.
+3. **Custom Local Detail Injection (`detailOverlaySvg`)**
+   - Inject panel-specific SVG details in character local coordinates (`(0, -535)` = head, `(0, -415)` = chest) — freezing breath vapor, glowing immortality veins, tears/blood, or runic marks.
+
+---
+
+### Validate, Inspect Narrative Health & Render
 
 1. **Strict Schema & SVG Sanitizer Validation**
    ```bash
    node <skill-dir>/scripts/tooncraft.mjs validate ./story.json --strict-svg --json
    ```
-   - Fix every schema error or sanitizer warning before rendering.
-
-2. **Render HTML5 Reader & Smart-Sliced Images (`PNG` + `WebP`)**
+2. **Inspect Narrative Health Score & Smart Slices**
+   ```bash
+   node <skill-dir>/scripts/tooncraft.mjs inspect ./story.json
+   ```
+   - Ensure **Narrative Health** achieves **Grade A or S** (`>= 80/100`) with zero narrative warnings!
+3. **Render HTML5 Reader & Smart-Sliced Images (`PNG` + `WebP`)**
    ```bash
    node <skill-dir>/scripts/tooncraft.mjs render ./story.json --format all --mode sliced --out ./out
    ```
 
-3. **Visual Post-Render Check**
-   - Inspect the rendered PNG slices to confirm that bubbles never obscure faces/eyes and that the Pass-2 character details look crisp and expressive.
-
 ## Quality Checklist Before Delivering
 
-- [ ] **Pass 1 Complete:** 5-beat Manhwa pacing, aggressive camera alternation, short cascading dialogue bubbles (<= 15 words each).
-- [ ] **Pass 2 Complete:** Every `character_figure` has tailored `expression`, `lightDirection`, `shadingIntensity`, `rimLightColor`, and rich character details (`accessories`, `weaponProp`, or `detailOverlaySvg`).
-- [ ] `tooncraft validate --strict-svg` exits with code `0` and zero warnings.
-- [ ] Visual inspection of the rendered PNG slices confirms zero text/face overlap and genuine anime/manhwa aesthetics.
+- [ ] **Pass 1 Complete:** `narrativeArc`, `cast[].narrativeProfile`, `narrativeBeat`, `subtextNote`, multi-speaker dialogue friction, and `tooncraft inspect` Narrative Health Grade **A** or **S**.
+- [ ] **Pass 2 Complete:** Dynamic camera alternation, flashback tint (`memoryTint`) where appropriate, and balanced smart-slice heights (`<= 1280px`).
+- [ ] **Pass 3 Complete:** Every `character_figure` has tailored `expression`, `lightDirection`, `shadingIntensity`, `rimLightColor`, and rich details (`accessories`, `weaponProp`, or `detailOverlaySvg`).
+- [ ] `tooncraft validate --strict-svg` exits with code `0` and visual inspection of rendered PNG slices confirms zero text/face overlap.

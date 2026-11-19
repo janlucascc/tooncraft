@@ -55,6 +55,25 @@ export const PacingTransitionSchema = z.enum([
   'gradient-shift',
 ]);
 
+export const NarrativeBeatSchema = z.enum([
+  'hook',
+  'character-bond',
+  'conflict-escalation',
+  'flashback-memory',
+  'catalyst',
+  'moral-dilemma',
+  'climax-choice',
+  'tragic-twist',
+  'cliffhanger',
+]);
+
+export const MemoryTintSchema = z.enum([
+  'none',
+  'sepia-flashback',
+  'crimson-trauma',
+  'frost-despair',
+]);
+
 export const PanelFrameSchema = z.object({
   type: FrameTypeSchema.default('standard'),
   /** Defaults to the theme's border color. */
@@ -73,6 +92,12 @@ export const PanelSchema = z.object({
   camera: CameraShotSchema.default('medium'),
   /** Narrative/mood metadata — used for docs, inspector and alt text. */
   moodDescription: z.string().max(300).optional(),
+  /** Dramatic role of this panel in the episode's screenplay. */
+  narrativeBeat: NarrativeBeatSchema.optional(),
+  /** Screenwriter note explaining the unspoken tension / subtext beneath the dialogue. */
+  subtextNote: z.string().max(300).optional(),
+  /** Optional atmospheric color-grading tint for flashback, memory or trauma beats. */
+  memoryTint: MemoryTintSchema.default('none'),
   frame: PanelFrameSchema.prefault({}),
   layers: z.array(VisualLayerSchema).min(1),
   bubbles: z.array(BubbleSchema).default([]),
@@ -89,5 +114,7 @@ export type FrameType = z.infer<typeof FrameTypeSchema>;
 export type CameraShot = z.infer<typeof CameraShotSchema>;
 export type PacingPreset = z.infer<typeof PacingPresetSchema>;
 export type PacingTransition = z.infer<typeof PacingTransitionSchema>;
+export type NarrativeBeat = z.infer<typeof NarrativeBeatSchema>;
+export type MemoryTint = z.infer<typeof MemoryTintSchema>;
 export type PanelFrame = z.infer<typeof PanelFrameSchema>;
 export type Panel = z.infer<typeof PanelSchema>;

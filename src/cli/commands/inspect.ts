@@ -4,6 +4,7 @@ import { validateEpisode } from '../../schema/index.js';
 import { resolveTheme } from '../../templates/themes.js';
 import { computeEpisodeLayout } from '../../engine/pacing-layout.js';
 import { computeSmartSlices } from '../../engine/image-exporter.js';
+import { analyzeEpisodeNarrative } from '../../engine/narrative-analyzer.js';
 
 export interface InspectCommandOptions {
   json?: boolean;
@@ -54,6 +55,7 @@ export function runInspect(filePath: string, opts: InspectCommandOptions): numbe
 
   // Average phone screen ~844px tall at 390px wide → ~1730px of 800px canvas height per screen.
   const mobileScreens = Number((layout.totalHeight / 1730).toFixed(1));
+  const narrative = analyzeEpisodeNarrative(ep, slices.length);
 
   const report = {
     title: ep.title,
@@ -73,6 +75,7 @@ export function runInspect(filePath: string, opts: InspectCommandOptions): numbe
       words: totalWords,
       estimatedSlices: slices.length,
     },
+    narrative,
     pacingDistribution: pacingCounts,
     slices: slices.map((s) => ({ index: s.index, height: s.height, yStart: s.yStart, yEnd: s.yEnd, cutReason: s.cutReason })),
   };
@@ -91,6 +94,15 @@ export function runInspect(filePath: string, opts: InspectCommandOptions): numbe
       .map(([k, v]) => `${k}=${v}`)
       .join(', ')}`,
   );
+  console.log(
+    `   Narrative Health: Grade ${narrative.grade} (${narrative.score}/100) · ${narrative.metrics.averageBubblesPerPanel} bubbles/panel · ${narrative.metrics.panelsPerSlice} panels/slice`,
+  );
+  if (narrative.strengths.length > 0) {
+    for (const st of narrative.strengths) console.log(`     ✔ ${st}`);
+  }
+  if (narrative.warnings.length > 0) {
+    for (const w of narrative.warnings) console.log(`     ⚠ ${w}`);
+  }
   console.log(`   Smart Slices (max ${ep.canvas.sliceMaxHeight}px): ${slices.length}`);
   for (const s of slices) {
     console.log(`     • slice-${String(s.index).padStart(3, '0')}: ${layout.width}×${s.height}px (y ${s.yStart}..${s.yEnd}, cut=${s.cutReason})`);

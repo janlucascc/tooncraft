@@ -1,12 +1,92 @@
 import type { Character } from '../schema/character.js';
-import type { Panel } from '../schema/panel.js';
+import type { MemoryTint, Panel } from '../schema/panel.js';
 import type { ResolvedTheme } from '../templates/themes.js';
 import type { GutterLayout, PanelLayout } from './pacing-layout.js';
-import { DefsCollector, IdFactory, el, escapeXml, linearGradient } from '../components/svg-utils.js';
+import {
+  DefsCollector,
+  IdFactory,
+   type PanelBox,
+  el,
+  escapeXml,
+  linearGradient,
+  radialGradient,
+} from '../components/svg-utils.js';
 import { buildPanelFrame } from '../components/frames/panel-frame.js';
 import { renderVisualLayers } from '../components/scenes/procedural-composer.js';
 import { renderBubble } from '../components/bubbles/render-bubble.js';
 import { renderSfx } from '../components/sfx/render-sfx.js';
+
+function renderMemoryTintOverlay(
+  tint: MemoryTint | undefined,
+  box: PanelBox,
+  defs: DefsCollector,
+): string {
+  if (!tint || tint === 'none') return '';
+
+  const cfg: Record<
+    Exclude<MemoryTint, 'none'>,
+    { wash: string; washOpacity: number; edge: string; barsColor: string }
+  > = {
+    'sepia-flashback': {
+      wash: '#78350F',
+      washOpacity: 0.28,
+      edge: '#1C1108',
+      barsColor: '#FEF3C7',
+    },
+    'crimson-trauma': {
+      wash: '#7F1D1D',
+      washOpacity: 0.26,
+      edge: '#180406',
+      barsColor: '#FCA5A5',
+    },
+    'frost-despair': {
+      wash: '#1E3A8A',
+      washOpacity: 0.25,
+      edge: '#060B19',
+      barsColor: '#BAE6FD',
+    },
+  };
+
+  const c = cfg[tint];
+  const vigId = defs.add('memvig', (id) =>
+    radialGradient(id, [
+      { offset: 0, color: c.wash, opacity: 0.05 },
+      { offset: 0.65, color: c.wash, opacity: c.washOpacity },
+      { offset: 1, color: c.edge, opacity: 0.78 },
+    ]),
+  );
+
+  // Subtle horizontal memory scan/fade lines at top and bottom of the flashback frame
+  let bars = '';
+  const lineYs = [18, 28, 36, box.height - 36, box.height - 28, box.height - 18];
+  for (const y of lineYs) {
+    bars += el('line', {
+      x1: 0,
+      y1: y,
+      x2: box.width,
+      y2: y,
+      stroke: c.barsColor,
+      'stroke-width': 1.2,
+      'stroke-opacity': 0.22,
+      'stroke-dasharray': '18 10 6 10',
+    });
+  }
+
+  return (
+    `<g data-memory-tint="${tint}">` +
+    el('rect', {
+      x: 0,
+      y: 0,
+      width: box.width,
+      height: box.height,
+      fill: c.wash,
+      'fill-opacity': c.washOpacity * 0.65,
+    }) +
+    el('rect', { x: 0, y: 0, width: box.width, height: box.height, fill: `url(#${vigId})` }) +
+    bars +
+    `</g>`
+  );
+}
 
 export interface PanelRenderOptions {
   panel: Panel;
@@ -78,9 +158,12 @@ export function renderPanelSvg(opts: PanelRenderOptions): string {
 
   overlays.sort((a, b) => a.z - b.z || a.order - b.order);
 
+  const memoryOverlay = renderMemoryTintOverlay(panel.memoryTint, box, defs);
+
   const body =
     el('rect', { x: 0, y: 0, width: box.width, height: box.height, fill: theme.scrollBackground }) +
     `<g data-scene="1">${scene}</g>` +
+    memoryOverlay +
     frame.matteSvg +
     frame.borderSvg +
     overlays.map((o) => o.svg).join('');

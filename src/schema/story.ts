@@ -5,6 +5,24 @@ import { PanelSchema } from './panel.js';
 
 export const SCHEMA_VERSION = '1.0.0' as const;
 
+/**
+ * Pass-1 Writer's Room narrative architecture for the episode.
+ * Ensures concrete human stakes, interpersonal friction, active protagonist choice,
+ * and an ironic cost or dramatic twist.
+ */
+export const EpisodeNarrativeArcSchema = z.object({
+  /** Specific human bond, promise, or concrete person at stake (never an abstract generality). */
+  emotionalAnchor: z.string().max(260),
+  /** The clash of wills, moral dilemma, or survival friction driving the episode. */
+  centralConflict: z.string().max(260),
+  /** The conscious sacrifice or defiant decision made by the protagonist at the climax. */
+  protagonistChoice: z.string().max(260),
+  /** The tragic price paid, ironic revelation, or cliffhanger twist at the end. */
+  ironicCostOrTwist: z.string().max(260),
+});
+
+export type EpisodeNarrativeArc = z.infer<typeof EpisodeNarrativeArcSchema>;
+
 /** Root document: one webtoon episode. */
 export const WebtoonEpisodeSchema = z
   .object({
@@ -14,6 +32,7 @@ export const WebtoonEpisodeSchema = z
     author: z.string().max(80).default('ToonCraft AI Director'),
     genre: z.string().max(40).default('Action'),
     synopsis: z.string().max(500).optional(),
+    narrativeArc: EpisodeNarrativeArcSchema.optional(),
     theme: ThemePresetSchema.default('dark-fantasy'),
     canvas: CanvasConfigSchema.prefault({}),
     cast: z.array(CharacterSchema).default([]),

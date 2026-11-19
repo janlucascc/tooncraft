@@ -71,6 +71,19 @@ export const CharacterBubbleThemeSchema = z.object({
   glowColor: ColorSchema.optional(),
 });
 
+/**
+ * Psychological & linguistic profile for Pass-1 Writer's Room development.
+ * Keeps character voice, inner wound and goal distinct across scenes.
+ */
+export const CharacterNarrativeProfileSchema = z.object({
+  /** Immediate visceral objective (e.g. "Keep his dying brother Kori warm through the blizzard"). */
+  coreGoal: z.string().max(200).optional(),
+  /** Inner wound, guilt, flaw or taboo (e.g. "Exiled by the clan elders for refusing to abandon the weak"). */
+  woundOrFlaw: z.string().max(200).optional(),
+  /** Speech diction, metaphors and rhythm (e.g. "Short primal sentences; metaphors of flint, marrow, ember and frost"). */
+  speechStyle: z.string().max(200).optional(),
+});
+
 export const CharacterSchema = z.object({
   /** Unique slug, e.g. "kael" or "system-ai". */
   id: z
@@ -84,6 +97,7 @@ export const CharacterSchema = z.object({
   eyeStyle: EyeStyleSchema.default('sharp-hunter'),
   hairStyle: HairStylePresetSchema.default('auto'),
   accessories: z.array(CharacterAccessorySchema).default([]),
+  narrativeProfile: CharacterNarrativeProfileSchema.optional(),
   bubbleTheme: CharacterBubbleThemeSchema.optional(),
 });
 
@@ -94,4 +108,5 @@ export type HairStylePreset = z.infer<typeof HairStylePresetSchema>;
 export type CharacterAccessory = z.infer<typeof CharacterAccessorySchema>;
 export type CharacterPalette = z.infer<typeof CharacterPaletteSchema>;
 export type CharacterBubbleTheme = z.infer<typeof CharacterBubbleThemeSchema>;
+export type CharacterNarrativeProfile = z.infer<typeof CharacterNarrativeProfileSchema>;
 export type Character = z.infer<typeof CharacterSchema>;
