@@ -1,0 +1,27 @@
+name: Bug Report
+description: Report a layout, SVG rendering, validation, or rasterization issue
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Clear description of the unexpected behavior or visual artifact.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal story.json
+      description: Paste the smallest story.json that reproduces the issue.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Node v22.x, Linux / macOS / Windows, tooncraft v0.1.0"
+    validations:
+      required: true

@@ -1,0 +1,196 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Monarch of Ash",
+  "episodeNumber": 1,
+  "author": "ToonCraft Showcase",
+  "genre": "Dungeon Fantasy",
+  "synopsis": "Left for dead inside a double-dungeon throne hall, Jin unlocks a forbidden hidden class.",
+  "theme": "solo-system",
+  "canvas": {
+    "width": 800,
+    "sliceMaxHeight": 1280
+  },
+  "cast": [
+    {
+      "id": "jin",
+      "name": "Jin",
+      "role": "protagonist",
+      "silhouettePreset": "hooded-mage",
+      "palette": {
+        "skin": "#F0CCB2",
+        "hair": "#0E1324",
+        "eyes": "#60A5FA",
+        "outfitPrimary": "#111A30",
+        "outfitAccent": "#38BDF8",
+        "aura": "#3B82F6"
+      }
+    },
+    {
+      "id": "warden",
+      "name": "Stone Warden",
+      "role": "antagonist",
+      "silhouettePreset": "armored-knight",
+      "palette": {
+        "skin": "#94A3B8",
+        "hair": "#1E293B",
+        "eyes": "#F59E0B",
+        "outfitPrimary": "#1E293B",
+        "outfitAccent": "#F59E0B",
+        "aura": "#F59E0B"
+      }
+    }
+  ],
+  "panels": [
+    {
+      "id": "p1-throne-hall",
+      "height": 820,
+      "camera": "wide",
+      "moodDescription": "Towering dungeon throne hall bathed in cold blue mana; the armored Stone Warden stands above Jin.",
+      "frame": { "type": "full-bleed", "borderWidth": 0 },
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#0A1B3D", "#030712"], "angleDeg": 180 },
+        { "type": "environment", "preset": "throne-hall", "perspectiveY": 64, "accentColor": "#3B82F6", "fogOpacity": 0.32 },
+        {
+          "type": "character_figure",
+          "characterId": "warden",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "position": { "x": 50, "y": 78 },
+          "scale": 0.82,
+          "rimLightColor": "#F59E0B",
+          "glowEyes": true,
+          "zIndex": 18
+        },
+        {
+          "type": "character_figure",
+          "characterId": "jin",
+          "framing": "full-body",
+          "pose": "crouching",
+          "expression": "shadowed",
+          "position": { "x": 28, "y": 98 },
+          "scale": 0.52,
+          "rimLightColor": "#60A5FA",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "mana-particles", "color": "#60A5FA", "intensity": 0.6 }
+      ],
+      "bubbles": [
+        {
+          "id": "b1-narr",
+          "type": "narration",
+          "text": "HP: **1 / 420**.\nA single breath away from the end.",
+          "position": { "x": 50, "y": 11 },
+          "maxWidth": 360
+        }
+      ],
+      "pacingAfter": "breath",
+      "pacingTransition": "gradient-shift",
+      "seed": 701
+    },
+    {
+      "id": "p2-system-prompt",
+      "height": 680,
+      "camera": "medium",
+      "moodDescription": "A holographic blue System Window materializes in mid-air with an arcane mana circle behind it.",
+      "frame": { "type": "standard", "borderWidth": 3, "borderColor": "#1D4ED8", "cornerRadius": 6 },
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#0D2456", "#020617"] },
+        { "type": "environment", "preset": "abstract-void", "perspectiveY": 78, "accentColor": "#38BDF8", "fogOpacity": 0.2 },
+        {
+          "type": "svg_raw",
+          "svgMarkup": "<g opacity=\"0.38\" stroke=\"#60A5FA\" fill=\"none\"><circle cx=\"400\" cy=\"340\" r=\"210\" stroke-width=\"2\" stroke-dasharray=\"12 8\"/><circle cx=\"400\" cy=\"340\" r=\"165\" stroke-width=\"3\"/><polygon points=\"400,150 565,435 235,435\" stroke-width=\"2\"/><polygon points=\"400,530 565,245 235,245\" stroke-width=\"2\"/></g>",
+          "zIndex": 15
+        },
+        { "type": "effect", "kind": "mana-particles", "color": "#93C5FD", "intensity": 0.85 }
+      ],
+      "bubbles": [
+        {
+          "id": "b2-sys-alert",
+          "type": "system_window",
+          "text": "Hidden Quest Cleared: **Courage of the Weak**.\n\nUnlock unique class: **[ SHADOW MONARCH ]**?\nRemaining time: **00:03**",
+          "position": { "x": 50, "y": 48 },
+          "maxWidth": 460,
+          "fontSize": 19,
+          "style": { "headerTitle": "[ SYSTEM NOTIFICATION ]" }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "sfx1-chime",
+          "text": "LEVEL UP!",
+          "style": "glow",
+          "position": { "x": 50, "y": 84 },
+          "fontSize": 52,
+          "rotation": 0,
+          "curveArc": 10,
+          "primaryColor": "#93C5FD",
+          "strokeColor": "#020617",
+          "strokeWidth": 6
+        }
+      ],
+      "pacingAfter": "dramatic_pause",
+      "pacingTransition": "fade-to-black",
+      "seed": 702
+    },
+    {
+      "id": "p3-arise",
+      "height": 880,
+      "camera": "close-up",
+      "moodDescription": "Jin rises bathed in cobalt mana aura, glowing blue eyes piercing the shadows.",
+      "frame": { "type": "diagonal-top", "skewDeg": 6, "borderWidth": 5, "borderColor": "#3B82F6" },
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#0F2963", "#020617"], "angleDeg": 180 },
+        { "type": "effect", "kind": "speedlines-vertical", "color": "#60A5FA", "intensity": 0.78 },
+        {
+          "type": "character_figure",
+          "characterId": "jin",
+          "framing": "bust",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "position": { "x": 50, "y": 100 },
+          "scale": 1.12,
+          "rimLightColor": "#60A5FA",
+          "glowEyes": true
+        },
+        { "type": "effect", "kind": "mana-particles", "color": "#BAE6FD", "intensity": 0.95, "zIndex": 32 }
+      ],
+      "bubbles": [
+        {
+          "id": "b3-telepathy",
+          "characterId": "jin",
+          "type": "telepathy",
+          "text": "The weak don't survive this floor.",
+          "position": { "x": 28, "y": 18 },
+          "maxWidth": 250
+        },
+        {
+          "id": "b4-arise",
+          "characterId": "jin",
+          "type": "shout",
+          "text": "ARISE.",
+          "position": { "x": 72, "y": 82 },
+          "maxWidth": 200,
+          "fontSize": 28,
+          "style": { "fillColor": "#030B1F", "strokeColor": "#60A5FA", "textColor": "#E0F2FE" },
+          "tail": { "enabled": true, "style": "sharp", "target": { "x": 54, "y": 64 } }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "sfx2-woosh",
+          "text": "WHOOOOSH",
+          "style": "impact",
+          "position": { "x": 50, "y": 10 },
+          "fontSize": 64,
+          "rotation": -4,
+          "primaryColor": "#DBEAFE",
+          "strokeColor": "#020617",
+          "shadowColor": "#2563EB"
+        }
+      ],
+      "pacingAfter": "normal",
+      "seed": 703
+    }
+  ]
+}

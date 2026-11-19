@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Rain on 4th Avenue",
+  "episodeNumber": 3,
+  "author": "ToonCraft Showcase",
+  "genre": "Noir Thriller",
+  "synopsis": "Detective Cole follows an anonymous message into a deserted street, where silence stretches across the scroll before a chilling reveal.",
+  "theme": "noir-thriller",
+  "canvas": {
+    "width": 800,
+    "sliceMaxHeight": 1280
+  },
+  "cast": [
+    {
+      "id": "cole",
+      "name": "Detective Cole",
+      "role": "protagonist",
+      "silhouettePreset": "suit-detective",
+      "palette": {
+        "skin": "#DFC7B4",
+        "hair": "#171717",
+        "eyes": "#A3A3A3",
+        "outfitPrimary": "#1F1F24",
+        "outfitAccent": "#DC2626",
+        "aura": "#DC2626"
+      }
+    },
+    {
+      "id": "caller",
+      "name": "Unknown",
+      "role": "antagonist",
+      "silhouettePreset": "shadow-entity",
+      "palette": {
+        "skin": "#0A0A0A",
+        "hair": "#0A0A0A",
+        "eyes": "#DC2626",
+        "outfitPrimary": "#09090B",
+        "outfitAccent": "#DC2626",
+        "aura": "#DC2626"
+      },
+      "bubbleTheme": {
+        "fillColor": "#111111",
+        "strokeColor": "#DC2626",
+        "textColor": "#F5F5F5"
+      }
+    }
+  ],
+  "panels": [
+    {
+      "id": "p1-street",
+      "height": 760,
+      "camera": "establishing",
+      "moodDescription": "Lonely rain-slicked avenue under harsh streetlamps.",
+      "frame": { "type": "standard", "borderWidth": 4, "borderColor": "#262626" },
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#050507", "#14161D", "#0A0A0D"], "angleDeg": 180 },
+        { "type": "environment", "preset": "rainy-street", "perspectiveY": 68, "accentColor": "#E5E7EB", "fogOpacity": 0.42 },
+        {
+          "type": "character_figure",
+          "characterId": "cole",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "shadowed",
+          "position": { "x": 30, "y": 96 },
+          "scale": 0.72,
+          "rimLightColor": "#E5E7EB"
+        },
+        { "type": "effect", "kind": "rain", "color": "#CBD5E1", "intensity": 0.78 },
+        { "type": "effect", "kind": "vignette", "color": "#000000", "intensity": 0.75 }
+      ],
+      "bubbles": [
+        {
+          "id": "b1-narr",
+          "type": "narration",
+          "text": "The rain washes away footprints — never the guilt.",
+          "position": { "x": 50, "y": 12 },
+          "maxWidth": 440
+        },
+        {
+          "id": "b2-phone",
+          "type": "phone_chat",
+          "text": "[11:58 PM] Don't turn around, Detective.",
+          "position": { "x": 70, "y": 36 },
+          "maxWidth": 280,
+          "tail": { "enabled": true, "style": "jagged", "target": { "x": 38, "y": 54 } }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "sfx1-drip",
+          "text": "bzzzt...",
+          "style": "ambient",
+          "position": { "x": 72, "y": 52 },
+          "fontSize": 34,
+          "rotation": 6,
+          "primaryColor": "#E5E7EB",
+          "strokeColor": "#000000",
+          "strokeWidth": 3
+        }
+      ],
+      "pacingAfter": "breath",
+      "pacingTransition": "fade-to-black",
+      "seed": 601
+    },
+    {
+      "id": "p2-thought",
+      "height": 520,
+      "camera": "close-up",
+      "moodDescription": "Cole freezes in profile as a cold sweat drop forms.",
+      "frame": { "type": "inset", "borderWidth": 3, "borderColor": "#404040" },
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#0C0D10", "#1F2128"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "cole",
+          "framing": "close-up",
+          "pose": "dramatic-profile",
+          "expression": "shocked",
+          "position": { "x": 56, "y": 100 },
+          "scale": 1.0,
+          "rimLightColor": "#F5F5F5"
+        },
+        { "type": "emotion_badge", "kind": "sweat-drop", "position": { "x": 42, "y": 42 }, "scale": 0.9 },
+        { "type": "effect", "kind": "halftone-vignette", "color": "#000000", "intensity": 0.8 }
+      ],
+      "bubbles": [
+        {
+          "id": "b3-thought",
+          "characterId": "cole",
+          "type": "thought",
+          "text": "Nobody knew I came to 4th Avenue tonight...",
+          "position": { "x": 28, "y": 24 },
+          "maxWidth": 250,
+          "tail": { "enabled": true, "style": "dots", "target": { "x": 48, "y": 44 } }
+        }
+      ],
+      "pacingAfter": "dramatic_pause",
+      "pacingTransition": "fade-to-black",
+      "seed": 602
+    },
+    {
+      "id": "p3-whisper-void",
+      "height": 420,
+      "camera": "extreme-close-up",
+      "moodDescription": "Minimalist noir whisper emerging from total darkness.",
+      "frame": { "type": "borderless", "borderWidth": 0 },
+      "layers": [
+        { "type": "backdrop", "kind": "solid", "colors": ["#000000"] },
+        {
+          "type": "svg_raw",
+          "svgMarkup": "<line x1=\"80\" y1=\"210\" x2=\"720\" y2=\"210\" stroke=\"#DC2626\" stroke-width=\"1.5\" opacity=\"0.45\"/><circle cx=\"400\" cy=\"210\" r=\"4\" fill=\"#DC2626\"/>"
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b4-whisper",
+          "characterId": "caller",
+          "type": "whisper",
+          "text": "*\"...I told you not to look.\"*",
+          "position": { "x": 50, "y": 50 },
+          "maxWidth": 300,
+          "fontSize": 22
+        }
+      ],
+      "pacingAfter": "scene_transition",
+      "pacingTransition": "fade-to-black",
+      "seed": 603
+    },
+    {
+      "id": "p4-reveal",
+      "height": 840,
+      "camera": "low-angle",
+      "moodDescription": "Crimson-eyed shadow silhouette looms out of the fog behind Cole.",
+      "frame": { "type": "full-bleed", "borderWidth": 0 },
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#3A060B", "#050204"] },
+        { "type": "environment", "preset": "dark-forest", "perspectiveY": 74, "accentColor": "#DC2626", "fogOpacity": 0.5 },
+        {
+          "type": "character_figure",
+          "characterId": "caller",
+          "framing": "bust",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "position": { "x": 50, "y": 100 },
+          "scale": 1.12,
+          "rimLightColor": "#DC2626",
+          "glowEyes": true
+        },
+        { "type": "effect", "kind": "screen-crack", "color": "#DC2626", "intensity": 0.45, "focalPoint": { "x": 50, "y": 38 } },
+        { "type": "effect", "kind": "rain", "color": "#FCA5A5", "intensity": 0.55 }
+      ],
+      "sfx": [
+        {
+          "id": "sfx2-thump",
+          "text": "BA-DUMP",
+          "style": "tremble",
+          "position": { "x": 50, "y": 84 },
+          "fontSize": 72,
+          "rotation": -3,
+          "primaryColor": "#DC2626",
+          "strokeColor": "#000000",
+          "strokeWidth": 7
+        }
+      ],
+      "pacingAfter": "normal",
+      "seed": 604
+    }
+  ]
+}

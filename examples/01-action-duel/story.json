@@ -1,0 +1,260 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Neon Blade: Sector 9",
+  "episodeNumber": 1,
+  "author": "ToonCraft Showcase",
+  "genre": "Cyberpunk Action",
+  "synopsis": "In a rain-drenched neon alley, assassin Vex crosses blades with rogue enforcer Ren in a split-second high-speed duel.",
+  "theme": "cyberpunk-neon",
+  "canvas": {
+    "width": 800,
+    "sliceMaxHeight": 1280
+  },
+  "cast": [
+    {
+      "id": "vex",
+      "name": "Vex",
+      "role": "protagonist",
+      "silhouettePreset": "cyber-assassin",
+      "palette": {
+        "skin": "#F0C8AE",
+        "hair": "#161124",
+        "eyes": "#22D3EE",
+        "outfitPrimary": "#1C1630",
+        "outfitAccent": "#FF2E88",
+        "aura": "#22D3EE"
+      },
+      "bubbleTheme": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#140D26",
+        "textColor": "#120B21"
+      }
+    },
+    {
+      "id": "ren",
+      "name": "Ren",
+      "role": "antagonist",
+      "silhouettePreset": "martial-artist",
+      "palette": {
+        "skin": "#EBC1A6",
+        "hair": "#3B0A1F",
+        "eyes": "#FDE047",
+        "outfitPrimary": "#1F1322",
+        "outfitAccent": "#22D3EE",
+        "aura": "#FF2E88"
+      },
+      "bubbleTheme": {
+        "fillColor": "#140D24",
+        "strokeColor": "#FF2E88",
+        "textColor": "#F8FAFC"
+      }
+    }
+  ],
+  "panels": [
+    {
+      "id": "p1-alley-establishing",
+      "height": 780,
+      "camera": "establishing",
+      "moodDescription": "Establishing wide shot of Sector 9's rain-slick neon alley; Vex stands waiting in the center.",
+      "frame": { "type": "full-bleed", "borderWidth": 0 },
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#090414", "#1F0A36", "#3A0D4A"], "angleDeg": 180 },
+        { "type": "environment", "preset": "cyberpunk-alley", "perspectiveY": 68, "accentColor": "#FF2E88", "fogOpacity": 0.35 },
+        {
+          "type": "character_figure",
+          "characterId": "vex",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "shadowed",
+          "position": { "x": 50, "y": 96 },
+          "scale": 0.72,
+          "rimLightColor": "#22D3EE",
+          "glowEyes": true
+        },
+        { "type": "effect", "kind": "rain", "color": "#A5F3FC", "intensity": 0.65 },
+        { "type": "effect", "kind": "vignette", "color": "#05020A", "intensity": 0.6 }
+      ],
+      "bubbles": [
+        {
+          "id": "b1-narr",
+          "type": "narration",
+          "text": "SECTOR 9 — 02:14 AM.\nNeon never sleeps, and neither do its bounties.",
+          "position": { "x": 50, "y": 11 },
+          "maxWidth": 460
+        },
+        {
+          "id": "b2-vex-calm",
+          "characterId": "vex",
+          "type": "speech",
+          "text": "You're **three minutes** late, Ren.",
+          "position": { "x": 74, "y": 35 },
+          "maxWidth": 185,
+          "tail": { "enabled": true, "style": "curved", "target": { "x": 54, "y": 48 } }
+        }
+      ],
+      "pacingAfter": "normal",
+      "seed": 101
+    },
+    {
+      "id": "p2-ren-taunt",
+      "height": 540,
+      "camera": "close-up",
+      "moodDescription": "Tight diagonal close-up of Ren smirking under pink neon glow.",
+      "frame": { "type": "diagonal-top", "skewDeg": -6, "borderWidth": 5, "borderColor": "#05030A" },
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#5B104E", "#120620"] },
+        { "type": "effect", "kind": "halftone-vignette", "color": "#05020B", "intensity": 0.7 },
+        {
+          "type": "character_figure",
+          "characterId": "ren",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "smirk",
+          "position": { "x": 38, "y": 100 },
+          "scale": 1.08,
+          "rimLightColor": "#FF2E88"
+        },
+        { "type": "effect", "kind": "chromatic-glitch", "color": "#FF2E88", "intensity": 0.35 }
+      ],
+      "bubbles": [
+        {
+          "id": "b3-ren-taunt",
+          "characterId": "ren",
+          "type": "speech",
+          "text": "Relax. **One second** is all I need to end this.",
+          "position": { "x": 72, "y": 32 },
+          "maxWidth": 260,
+          "tail": { "enabled": true, "style": "sharp", "target": { "x": 45, "y": 55 } }
+        }
+      ],
+      "pacingAfter": "tight",
+      "seed": 202
+    },
+    {
+      "id": "p3-eyes-flash",
+      "height": 340,
+      "camera": "extreme-close-up",
+      "moodDescription": "Razor-thin eyes-only reaction cut as Vex locks on.",
+      "frame": { "type": "diagonal-both", "skewDeg": 5, "borderWidth": 5, "borderColor": "#22D3EE" },
+      "layers": [
+        { "type": "backdrop", "kind": "solid", "colors": ["#080514"] },
+        {
+          "type": "character_figure",
+          "characterId": "vex",
+          "framing": "eyes-only",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "position": { "x": 50, "y": 100 },
+          "scale": 1.15,
+          "glowEyes": true
+        },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#22D3EE", "intensity": 0.65, "focalPoint": { "x": 50, "y": 50 } }
+      ],
+      "sfx": [
+        {
+          "id": "sfx1-shing",
+          "text": "SHING!",
+          "style": "glow",
+          "position": { "x": 80, "y": 72 },
+          "fontSize": 46,
+          "rotation": -10,
+          "primaryColor": "#22D3EE",
+          "strokeColor": "#040814"
+        }
+      ],
+      "pacingAfter": "tight",
+      "seed": 303
+    },
+    {
+      "id": "p4-plasma-slash",
+      "height": 960,
+      "camera": "dutch-angle",
+      "moodDescription": "Full-height action splash: Vex lunges forward slicing the frame with a glowing plasma blade arc.",
+      "frame": { "type": "shattered", "borderWidth": 6, "borderColor": "#04020A" },
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#0B041A", "#2E0938", "#071E2E"], "angleDeg": 145 },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#FF2E88", "intensity": 0.9, "focalPoint": { "x": 52, "y": 46 } },
+        {
+          "type": "character_figure",
+          "characterId": "vex",
+          "framing": "full-body",
+          "pose": "action-lunge",
+          "expression": "angry",
+          "position": { "x": 42, "y": 90 },
+          "scale": 0.94,
+          "rimLightColor": "#22D3EE",
+          "glowEyes": true
+        },
+        {
+          "type": "svg_raw",
+          "svgMarkup": "<defs><linearGradient id=\"blade\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\"0.4\" stop-color=\"#22D3EE\"/><stop offset=\"1\" stop-color=\"#FF2E88\"/></linearGradient><filter id=\"bglow\" x=\"-40%\" y=\"-40%\" width=\"180%\" height=\"180%\"><feGaussianBlur stdDeviation=\"7\" result=\"b\"/><feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge></filter></defs><path d=\"M60 760 C 260 520 500 320 770 110 C 560 360 340 590 120 820 Z\" fill=\"url(#blade)\" filter=\"url(#bglow)\"/><path d=\"M95 775 C 290 545 520 350 755 135\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"6\" stroke-linecap=\"round\"/>",
+          "zIndex": 28
+        },
+        { "type": "effect", "kind": "impact-flash", "color": "#22D3EE", "intensity": 0.75, "focalPoint": { "x": 62, "y": 32 }, "zIndex": 31 },
+        { "type": "effect", "kind": "embers", "color": "#FDE047", "intensity": 0.8, "zIndex": 32 }
+      ],
+      "bubbles": [
+        {
+          "id": "b4-vex-shout",
+          "characterId": "vex",
+          "type": "shout",
+          "text": "TOO SLOW!!",
+          "position": { "x": 26, "y": 16 },
+          "maxWidth": 220,
+          "fontSize": 24,
+          "tail": { "enabled": true, "style": "jagged", "target": { "x": 40, "y": 32 } }
+        }
+      ],
+      "sfx": [
+        {
+          "id": "sfx2-slash",
+          "text": "SLASH!!",
+          "style": "slash",
+          "position": { "x": 62, "y": 76 },
+          "fontSize": 92,
+          "rotation": -18,
+          "primaryColor": "#FDE047",
+          "strokeColor": "#1A0524",
+          "strokeWidth": 9,
+          "shadowColor": "#FF2E88"
+        }
+      ],
+      "pacingAfter": "dramatic_pause",
+      "pacingTransition": "fade-to-black",
+      "seed": 404
+    },
+    {
+      "id": "p5-aftermath",
+      "height": 640,
+      "camera": "wide",
+      "moodDescription": "Quiet aftermath against the neon skyline as the rain resumes.",
+      "frame": { "type": "borderless", "borderWidth": 0 },
+      "layers": [
+        { "type": "backdrop", "kind": "night-sky", "colors": ["#070412", "#1A0B2E"], "starsDensity": 0.4 },
+        { "type": "environment", "preset": "neon-skyline", "perspectiveY": 72, "accentColor": "#22D3EE", "fogOpacity": 0.3 },
+        {
+          "type": "character_figure",
+          "characterId": "vex",
+          "framing": "waist-up",
+          "pose": "facing-away",
+          "expression": "neutral",
+          "position": { "x": 50, "y": 100 },
+          "scale": 0.9,
+          "rimLightColor": "#FF2E88"
+        },
+        { "type": "effect", "kind": "rain", "color": "#E0F2FE", "intensity": 0.45 }
+      ],
+      "bubbles": [
+        {
+          "id": "b5-aftermath",
+          "type": "narration",
+          "text": "Contract closed. Next target: **Skyline Tower**.",
+          "position": { "x": 50, "y": 18 },
+          "maxWidth": 420
+        }
+      ],
+      "pacingAfter": "normal",
+      "seed": 505
+    }
+  ]
+}

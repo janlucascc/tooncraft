@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run validate:examples
+      - run: npm run render:examples
+
+      - name: Package showcase HTML readers
+        run: |
+          mkdir -p release-assets
+          cp output/examples/01-action-duel/index.html release-assets/01-action-duel.html
+          cp output/examples/02-dramatic-pause/index.html release-assets/02-dramatic-pause.html
+          cp output/examples/03-system-awakening/index.html release-assets/03-system-awakening.html
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/*.html

@@ -1,0 +1,25 @@
+name: Feature Request
+description: Propose a new silhouette preset, environment, bubble type, effect or exporter
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Character silhouettes / outfits
+        - Procedural environments
+        - Speech bubbles / lettering / SFX
+        - Effects / frames
+        - HTML reader / image exporter
+        - Agent Skill (SKILL.md)
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the visual or workflow capability you'd like to add.
+    validations:
+      required: true

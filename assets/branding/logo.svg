@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#FF2E88"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="24" fill="url(#bg)" stroke="url(#accent)" stroke-width="4"/>
+  <!-- Vertical webtoon panel stack icon -->
+  <rect x="26" y="18" width="76" height="24" rx="4" fill="#1E293B" stroke="#22D3EE" stroke-width="2.5"/>
+  <polygon points="26,50 102,44 102,78 26,84" fill="url(#accent)"/>
+  <rect x="26" y="92" width="76" height="18" rx="4" fill="#1E293B" stroke="#FF2E88" stroke-width="2.5"/>
+  <!-- Stylized speech bubble -->
+  <ellipse cx="64" cy="64" rx="22" ry="12" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"/>
+  <polygon points="58,74 52,85 68,75" fill="#FFFFFF" stroke="#0F172A" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="58,73 53,83 68,74" fill="#FFFFFF"/>
+</svg>
