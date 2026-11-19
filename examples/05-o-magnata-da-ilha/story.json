@@ -1,0 +1,669 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "O Magnata da Ilha",
+  "episodeNumber": 1,
+  "author": "ToonCraft AI Director",
+  "genre": "Noir Thriller",
+  "synopsis": "Adrian Voss, bilionário dono de uma ilha privada fora de qualquer mapa, é descoberto pelo FBI numa noite de chuva. Com os associados divididos entre a delação e a lealdade, resta saber: o que se leva de uma ilha que nunca existiu?",
+  "theme": "noir-thriller",
+  "canvas": { "width": 800, "sliceMaxHeight": 1280 },
+  "narrativeArc": {
+    "emotionalAnchor": "Voss prometeu à filha Clara que não haveria mais sangue na ilha",
+    "centralConflict": "O FBI cerca a ilha; Rui quer delatar, Dante quer lutar e Clara exige a verdade",
+    "protagonistChoice": "Voss incendeia o servidor com os nomes de todos e foge sozinho pelo mar",
+    "ironicCostOrTwist": "Rui já enviara o ledger ao FBI antes do raid — a fuga de Voss é a prova final do crime"
+  },
+  "cast": [
+    {
+      "id": "voss",
+      "name": "Adrian Voss",
+      "role": "protagonist",
+      "silhouettePreset": "suit-detective",
+      "eyeStyle": "villain-narrow",
+      "hairStyle": "undercut-sleek",
+      "accessories": [],
+      "narrativeProfile": {
+        "coreGoal": "Nunca mais depender de ninguém — nem dos próprios amigos",
+        "woundOrFlaw": "Acredita que lealdade se compra, porque nunca recebeu de graça",
+        "speechStyle": "Frases curtas e geladas; fala de impérios, não de pessoas"
+      },
+      "palette": {
+        "skin": "#E8C39E",
+        "hair": "#1F2937",
+        "eyes": "#94A3B8",
+        "outfitPrimary": "#0F172A",
+        "outfitAccent": "#F59E0B",
+        "aura": "#F59E0B"
+      }
+    },
+    {
+      "id": "clara",
+      "name": "Clara Voss",
+      "role": "supporting",
+      "silhouettePreset": "casual-student",
+      "eyeStyle": "soft-shojo",
+      "hairStyle": "long-flowing",
+      "accessories": [],
+      "narrativeProfile": {
+        "coreGoal": "Salvar o pai de si mesmo, mesmo que isso o destrua",
+        "woundOrFlaw": "Ama o pai, mas já não reconhece o homem que ele virou",
+        "speechStyle": "Voz baixa e direta; usa perguntas como acusações"
+      },
+      "palette": {
+        "skin": "#F0D5C0",
+        "hair": "#6B4F3A",
+        "eyes": "#7DD3FC",
+        "outfitPrimary": "#334155",
+        "outfitAccent": "#38BDF8",
+        "aura": "#38BDF8"
+      }
+    },
+    {
+      "id": "dante",
+      "name": "Dante Rocha",
+      "role": "supporting",
+      "silhouettePreset": "armored-knight",
+      "eyeStyle": "sharp-hunter",
+      "hairStyle": "undercut-sleek",
+      "accessories": [],
+      "narrativeProfile": {
+        "coreGoal": "Permanecer ao lado de Voss, custe o que custar",
+        "woundOrFlaw": "Lealdade cega: não distingue proteger o amigo de proteger o mito",
+        "speechStyle": "Prático, curto, militar; fala de portas, pontes e rotas"
+      },
+      "palette": {
+        "skin": "#C9A27E",
+        "hair": "#111827",
+        "eyes": "#F59E0B",
+        "outfitPrimary": "#1F2937",
+        "outfitAccent": "#64748B",
+        "aura": "#94A3B8"
+      }
+    },
+    {
+      "id": "duarte",
+      "name": "Agente Marina Duarte",
+      "role": "antagonist",
+      "silhouettePreset": "cyber-assassin",
+      "eyeStyle": "standard-anime",
+      "hairStyle": "undercut-sleek",
+      "accessories": ["cyber-visor"],
+      "narrativeProfile": {
+        "coreGoal": "Levar Voss a julgamento com o ledger completo",
+        "woundOrFlaw": "Obcecada: confunde justiça com vingança pessoal",
+        "speechStyle": "Fria e cirúrgica; repete as palavras dos outros contra eles"
+      },
+      "palette": {
+        "skin": "#D9B48F",
+        "hair": "#0F172A",
+        "eyes": "#22D3EE",
+        "outfitPrimary": "#0B1220",
+        "outfitAccent": "#22D3EE",
+        "aura": "#22D3EE"
+      }
+    },
+    {
+      "id": "rui",
+      "name": "Rui Valente",
+      "role": "supporting",
+      "silhouettePreset": "hooded-mage",
+      "eyeStyle": "mystic-glow",
+      "hairStyle": "auto",
+      "accessories": ["cloak-clasp"],
+      "narrativeProfile": {
+        "coreGoal": "Sair da ilha com o próprio nome limpo",
+        "woundOrFlaw": "Cético: não acredita em lealdade, só em versões",
+        "speechStyle": "Cerimonioso, metafórico; negocia até as despedidas"
+      },
+      "palette": {
+        "skin": "#D9B48F",
+        "hair": "#292524",
+        "eyes": "#DC2626",
+        "outfitPrimary": "#450A0A",
+        "outfitAccent": "#B91C1C",
+        "aura": "#EF4444"
+      }
+    }
+  ],
+  "panels": [
+    {
+      "id": "p1-island-rain",
+      "height": 700,
+      "camera": "wide",
+      "moodDescription": "Noite de chuva na Ilha de Voss: o mar engole a ponte e o vento apaga as luzes do deque.",
+      "narrativeBeat": "hook",
+      "subtextNote": "A ilha é uma fortaleza sem muros: quem controla a ponte controla quem entra e quem sai.",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 4 },
+      "pacingAfter": "normal",
+      "layers": [
+        { "type": "backdrop", "kind": "night-sky", "colors": ["#020617", "#0B1220", "#020617"], "angleDeg": 180, "starsDensity": 0.7 },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "shadowed",
+          "position": { "x": 50, "y": 82 },
+          "scale": 0.82,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "back-rim",
+          "shadingIntensity": "dramatic-noir",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "rain", "color": "#94A3B8", "intensity": 0.55 },
+        { "type": "effect", "kind": "vignette", "intensity": 0.5 }
+      ],
+      "bubbles": [
+        {
+          "id": "b1-narr",
+          "type": "narration",
+          "text": "A Ilha de Voss não aparece em nenhum mapa. A lei também não.",
+          "position": { "x": 50, "y": 10 },
+          "maxWidth": 380,
+          "fontSize": 19,
+          "style": { "fillColor": "#0B0C10", "strokeColor": "#F59E0B", "textColor": "#FBBF24" }
+        },
+        {
+          "id": "b1-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Dez anos. Dez invernos sem que ninguém cruzasse aquela ponte.",
+          "position": { "x": 50, "y": 74 },
+          "maxWidth": 300,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p2-fbi-raid",
+      "height": 620,
+      "camera": "dutch-angle",
+      "moodDescription": "O salão principal da mansão explode em luz vermelha: agentes do FBI invadem a ilha pela ponte que Dante jurava intransponível.",
+      "narrativeBeat": "catalyst",
+      "subtextNote": "A ponte caiu por dentro: quem a construiu sabia onde ela era fraca.",
+      "frame": { "type": "shattered", "borderWidth": 6, "skewDeg": -10 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#7F1D1D", "#0B0C10"], "angleDeg": 180 },
+        { "type": "environment", "preset": "throne-hall", "perspectiveY": 62, "accentColor": "#22D3EE", "fogOpacity": 0.35 },
+        {
+          "type": "character_figure",
+          "characterId": "duarte",
+          "framing": "full-body",
+          "pose": "action-lunge",
+          "expression": "determined",
+          "position": { "x": 68, "y": 80 },
+          "scale": 0.8,
+          "rimLightColor": "#22D3EE",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "auraIntensity": 0.25,
+          "zIndex": 22
+        },
+        {
+          "type": "character_figure",
+          "characterId": "dante",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "angry",
+          "position": { "x": 24, "y": 84 },
+          "scale": 0.86,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "impact-flash", "color": "#EF4444", "intensity": 0.45 },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#FCA5A5", "intensity": 0.35 }
+      ],
+      "bubbles": [
+        {
+          "id": "b2-duarte",
+          "characterId": "duarte",
+          "type": "shout",
+          "text": "FBI! Ninguém se mexe! A ponte, o deque e o mar — tudo nosso.",
+          "position": { "x": 50, "y": 8 },
+          "maxWidth": 340,
+          "fontSize": 19
+        },
+        {
+          "id": "b2-dante",
+          "characterId": "dante",
+          "type": "speech",
+          "text": "A ponte caiu. Estamos cercados por três lados.",
+          "position": { "x": 50, "y": 30 },
+          "maxWidth": 280,
+          "fontSize": 18
+        },
+        {
+          "id": "b2-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Então sobram dois. O mar e a noite.",
+          "position": { "x": 50, "y": 52 },
+          "maxWidth": 280,
+          "fontSize": 18
+        }
+      ],
+      "sfx": [
+        { "id": "sfx2", "text": "BANG", "style": "impact", "position": { "x": 22, "y": 22 }, "fontSize": 58, "primaryColor": "#FCA5A5", "strokeColor": "#7F1D1D", "rotation": -14 }
+      ]
+    },
+    {
+      "id": "p3-first-night",
+      "height": 560,
+      "camera": "medium",
+      "moodDescription": "Flashback sépia: a primeira noite da ilha, quando Voss ainda dividia o champanhe com amigos em vez de desconfiar deles.",
+      "narrativeBeat": "flashback-memory",
+      "subtextNote": "A ilha começou como um presente para os amigos. Virou uma jaula com vista para o mar.",
+      "frame": { "type": "inset", "borderWidth": 3, "cornerRadius": 16 },
+      "pacingAfter": "breath",
+      "memoryTint": "sepia-flashback",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#78350F", "#451A03", "#1C0A00"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "waist-up",
+          "pose": "standing",
+          "expression": "smirk",
+          "position": { "x": 30, "y": 92 },
+          "scale": 0.8,
+          "rimLightColor": "#FBBF24",
+          "lightDirection": "left",
+          "shadingIntensity": "soft",
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "rui",
+          "framing": "waist-up",
+          "pose": "standing",
+          "expression": "neutral",
+          "position": { "x": 74, "y": 92 },
+          "scale": 0.78,
+          "rimLightColor": "#EF4444",
+          "lightDirection": "left",
+          "shadingIntensity": "soft",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "embers", "color": "#FBBF24", "intensity": 0.4 }
+      ],
+      "bubbles": [
+        {
+          "id": "b3-narr",
+          "type": "narration",
+          "text": "Três anos atrás, a ilha era só festa e silêncio.",
+          "position": { "x": 50, "y": 6 },
+          "maxWidth": 340,
+          "fontSize": 18
+        },
+        {
+          "id": "b3-rui",
+          "characterId": "rui",
+          "type": "speech",
+          "text": "Você construiu um império, Adrian. Impérios não têm dono. Têm sócios.",
+          "position": { "x": 50, "y": 56 },
+          "maxWidth": 320,
+          "fontSize": 18
+        },
+        {
+          "id": "b3-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Você é meu amigo, Rui. Amigos não cobram.",
+          "position": { "x": 50, "y": 78 },
+          "maxWidth": 300,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p4-deal",
+      "height": 640,
+      "camera": "medium",
+      "moodDescription": "A biblioteca da mansão: Rui abre o ledger sobre a mesa de carvalho enquanto a chuva bate nas vidraças.",
+      "narrativeBeat": "conflict-escalation",
+      "subtextNote": "Rui não está ameaçando: está pedindo licença para sobreviver. A diferença é o que Voss não enxerga.",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 4 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#1C1917", "#0C0A09"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "waist-up",
+          "pose": "standing",
+          "expression": "angry",
+          "position": { "x": 28, "y": 88 },
+          "scale": 0.86,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "rui",
+          "framing": "waist-up",
+          "pose": "standing",
+          "expression": "neutral",
+          "position": { "x": 74, "y": 88 },
+          "scale": 0.84,
+          "rimLightColor": "#EF4444",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "rain", "color": "#64748B", "intensity": 0.35 },
+        { "type": "emotion_badge", "kind": "anger-vein", "position": { "x": 26, "y": 58 }, "scale": 0.9, "color": "#F59E0B" }
+      ],
+      "bubbles": [
+        {
+          "id": "b4-rui",
+          "characterId": "rui",
+          "type": "speech",
+          "text": "Entregue o ledger. O FBI oferece delação. Você envelhece numa cela, não numa ilha.",
+          "position": { "x": 50, "y": 8 },
+          "maxWidth": 340,
+          "fontSize": 18
+        },
+        {
+          "id": "b4-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Você fala de delação como quem fala de meteorologia. Frio. Distante.",
+          "position": { "x": 50, "y": 34 },
+          "maxWidth": 320,
+          "fontSize": 18
+        },
+        {
+          "id": "b4-rui2",
+          "characterId": "rui",
+          "type": "speech",
+          "text": "Eu falo como quem ainda quer te ver vivo, Adrian.",
+          "position": { "x": 50, "y": 62 },
+          "maxWidth": 300,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p5-clara-truth",
+      "height": 520,
+      "camera": "close-up",
+      "moodDescription": "O quarto de Clara, luz de vela: pai e filha frente a frente pela primeira vez sem a ilha entre os dois.",
+      "narrativeBeat": "character-bond",
+      "subtextNote": "Clara não quer o império. Ela quer o pai de volta — e já sabe que ele não existe mais.",
+      "frame": { "type": "inset", "borderWidth": 3, "cornerRadius": 18 },
+      "pacingAfter": "breath",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#1E293B", "#020617"] },
+        {
+          "type": "character_figure",
+          "characterId": "clara",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "pain",
+          "position": { "x": 32, "y": 70 },
+          "scale": 0.86,
+          "rimLightColor": "#38BDF8",
+          "lightDirection": "left",
+          "shadingIntensity": "standard",
+          "detailOverlaySvg": "<path d=\"M-16 -524L-15 -498\" fill=\"none\" stroke=\"#BAE6FD\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M16 -524L17 -498\" fill=\"none\" stroke=\"#BAE6FD\" stroke-width=\"1.6\" stroke-linecap=\"round\"/>",
+          "zIndex": 22
+        },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "shadowed",
+          "position": { "x": 70, "y": 70 },
+          "scale": 0.86,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "left",
+          "shadingIntensity": "standard",
+          "zIndex": 20
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b5-clara",
+          "characterId": "clara",
+          "type": "speech",
+          "text": "Você prometeu que não haveria mais sangue na ilha, papai.",
+          "position": { "x": 50, "y": 40 },
+          "maxWidth": 320,
+          "fontSize": 18
+        },
+        {
+          "id": "b5-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "E não há. O que há é fogo. Fogo limpa.",
+          "position": { "x": 50, "y": 62 },
+          "maxWidth": 300,
+          "fontSize": 18
+        },
+        {
+          "id": "b5-clara2",
+          "characterId": "clara",
+          "type": "whisper",
+          "text": "Eu não sou mais criança. Eu vi o que o fogo esconde.",
+          "position": { "x": 50, "y": 82 },
+          "maxWidth": 320,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p6-burn-server",
+      "height": 1000,
+      "camera": "low-angle",
+      "moodDescription": "A sala de servidores pega fogo: Voss joga a lima de isolamento no rack enquanto Dante segura a porta contra os agentes.",
+      "narrativeBeat": "climax-choice",
+      "subtextNote": "O fogo não é destruição: é a única herança que Voss sabe deixar para os amigos — o nome deles apagado.",
+      "frame": { "type": "full-bleed", "borderWidth": 0 },
+      "pacingAfter": "dramatic_pause",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#7C2D12", "#0B0C10"], "angleDeg": 180 },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "full-body",
+          "pose": "action-lunge",
+          "expression": "determined",
+          "position": { "x": 62, "y": 86 },
+          "scale": 0.78,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "bottom-fire",
+          "shadingIntensity": "dramatic-noir",
+          "auraIntensity": 0.55,
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "dante",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "angry",
+          "position": { "x": 20, "y": 88 },
+          "scale": 0.8,
+          "rimLightColor": "#94A3B8",
+          "lightDirection": "bottom-fire",
+          "shadingIntensity": "heavy",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "embers", "color": "#FB923C", "intensity": 0.8 },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#FDBA74", "intensity": 0.4 }
+      ],
+      "bubbles": [
+        {
+          "id": "b6-dante",
+          "characterId": "dante",
+          "type": "shout",
+          "text": "O servidor já está queimando. Vai, Adrian. Eu seguro a porta.",
+          "position": { "x": 50, "y": 8 },
+          "maxWidth": 340,
+          "fontSize": 19
+        },
+        {
+          "id": "b6-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Você vem comigo.",
+          "position": { "x": 50, "y": 36 },
+          "maxWidth": 240,
+          "fontSize": 18
+        },
+        {
+          "id": "b6-dante2",
+          "characterId": "dante",
+          "type": "speech",
+          "text": "Alguém precisa ficar para contar a versão certa.",
+          "position": { "x": 50, "y": 62 },
+          "maxWidth": 320,
+          "fontSize": 18
+        }
+      ],
+      "sfx": [
+        { "id": "sfx6", "text": "FWOO", "style": "ambient", "position": { "x": 30, "y": 18 }, "fontSize": 72, "primaryColor": "#FDBA74", "strokeColor": "#7C2D12", "curveArc": 8 }
+      ]
+    },
+    {
+      "id": "p7-betrayal",
+      "height": 680,
+      "camera": "close-up",
+      "moodDescription": "Do lado de fora, sob a chuva: Duarte encosta o rádio no rosto de Voss e entrega a notícia que quebra o império.",
+      "narrativeBeat": "tragic-twist",
+      "subtextNote": "A traição não veio do FBI. Veio da mesa de carvalho, três noites antes do raid.",
+      "frame": { "type": "diagonal-top", "borderWidth": 4, "skewDeg": -6 },
+      "pacingAfter": "breath",
+      "layers": [
+        { "type": "backdrop", "kind": "night-sky", "colors": ["#020617", "#0B1220"], "angleDeg": 180, "starsDensity": 0.4 },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "close-up",
+          "pose": "standing",
+          "expression": "shocked",
+          "position": { "x": 68, "y": 74 },
+          "scale": 0.9,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "right",
+          "shadingIntensity": "dramatic-noir",
+          "detailOverlaySvg": "<path d=\"M-20 -540L-22 -516\" fill=\"none\" stroke=\"#E2E8F0\" stroke-width=\"1.4\" stroke-linecap=\"round\" opacity=\"0.8\"/><circle cx=\"14\" cy=\"-512\" r=\"1.8\" fill=\"#E2E8F0\" opacity=\"0.85\"/>",
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "duarte",
+          "framing": "close-up",
+          "pose": "dramatic-profile",
+          "expression": "smirk",
+          "position": { "x": 26, "y": 74 },
+          "scale": 0.9,
+          "rimLightColor": "#22D3EE",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 22
+        },
+        { "type": "effect", "kind": "rain", "color": "#94A3B8", "intensity": 0.45 },
+        { "type": "emotion_badge", "kind": "shock-lines", "position": { "x": 66, "y": 56 }, "scale": 1.1, "color": "#F59E0B" }
+      ],
+      "bubbles": [
+        {
+          "id": "b7-duarte",
+          "characterId": "duarte",
+          "type": "speech",
+          "text": "Rui mandou o ledger para a gente ontem à noite. Cada nome. Cada conta.",
+          "position": { "x": 50, "y": 8 },
+          "maxWidth": 340,
+          "fontSize": 18
+        },
+        {
+          "id": "b7-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Não. Ele era meu amigo.",
+          "position": { "x": 50, "y": 38 },
+          "maxWidth": 260,
+          "fontSize": 18
+        },
+        {
+          "id": "b7-duarte2",
+          "characterId": "duarte",
+          "type": "speech",
+          "text": "Amigos não mandam nada. Sócios, sim.",
+          "position": { "x": 50, "y": 66 },
+          "maxWidth": 300,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p8-dawn-sea",
+      "height": 1120,
+      "camera": "wide",
+      "moodDescription": "Amanhecer: Voss sozinho no barco, a ilha ardendo no horizonte e o rádio do FBI crepitando atrás dele.",
+      "narrativeBeat": "cliffhanger",
+      "subtextNote": "Ele venceu a ilha, o fogo e o FBI. Perdeu a única coisa que a ilha não podia comprar: o que ele era antes dela.",
+      "frame": { "type": "full-bleed", "borderWidth": 0 },
+      "pacingAfter": "scene_transition",
+      "layers": [
+        { "type": "backdrop", "kind": "horizon-glow", "colors": ["#0F172A", "#7C2D12", "#F59E0B"], "angleDeg": 0, "starsDensity": 0.15 },
+        {
+          "type": "character_figure",
+          "characterId": "voss",
+          "framing": "full-body",
+          "pose": "standing",
+          "expression": "shadowed",
+          "position": { "x": 50, "y": 88 },
+          "scale": 0.72,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "back-rim",
+          "shadingIntensity": "dramatic-noir",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "embers", "color": "#FB923C", "intensity": 0.5 },
+        { "type": "effect", "kind": "vignette", "intensity": 0.55 }
+      ],
+      "bubbles": [
+        {
+          "id": "b8-narr",
+          "type": "narration",
+          "text": "O amanhecer encontrou o mar vazio e a ilha em chamas.",
+          "position": { "x": 50, "y": 8 },
+          "maxWidth": 380,
+          "fontSize": 19,
+          "style": { "fillColor": "#0B0C10", "strokeColor": "#F59E0B", "textColor": "#FBBF24" }
+        },
+        {
+          "id": "b8-voss",
+          "characterId": "voss",
+          "type": "speech",
+          "text": "Eles podem ter o império. Eu ainda tenho o mar.",
+          "position": { "x": 50, "y": 26 },
+          "maxWidth": 340,
+          "fontSize": 19
+        },
+        {
+          "id": "b8-duarte",
+          "characterId": "duarte",
+          "type": "speech",
+          "text": "A fuga também é confissão, senhor Voss. Até logo.",
+          "position": { "x": 50, "y": 46 },
+          "maxWidth": 340,
+          "fontSize": 19
+        }
+      ],
+      "sfx": []
+    }
+  ]
+}
