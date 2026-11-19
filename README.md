@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/branding/banner.svg" alt="ToonCraft — Code-as-Webtoon Engine & AI Agent Skill" width="100%"/>
+  <img src="./assets/branding/banner.png" alt="ToonCraft — Code-as-Webtoon Engine & AI Agent Skill" width="100%"/>
 </p>
 
 <p align="center">
