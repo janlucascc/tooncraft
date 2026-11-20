@@ -116,4 +116,38 @@ describe('WebtoonEpisodeSchema validation', () => {
       );
     }
   });
+
+  it.each(['../secret.png', 'sub/../secret.png', '/etc/passwd', 'C:\\secret.png'])(
+    'rejects unsafe image_ref src "%s"',
+    (badSrc) => {
+      const res = validateEpisode({
+        title: 'Unsafe Image Ref',
+        panels: [
+          {
+            id: 'p1',
+            height: 500,
+            layers: [{ type: 'image_ref', src: badSrc }],
+          },
+        ],
+      });
+      expect(res.success).toBe(false);
+      if (!res.success) {
+        expect(res.errors.map((e) => e.path)).toContain('panels[0].layers[0].src');
+      }
+    },
+  );
+
+  it('accepts safe relative image_ref src', () => {
+    const res = validateEpisode({
+      title: 'Safe Image Ref',
+      panels: [
+        {
+          id: 'p1',
+          height: 500,
+          layers: [{ type: 'image_ref', src: 'assets/panel-01.png' }],
+        },
+      ],
+    });
+    expect(res.success).toBe(true);
+  });
 });

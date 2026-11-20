@@ -4,7 +4,9 @@ import {
   FONT_FACES,
   FONT_SETS,
   type FontKey,
+  clearFontCache,
   getAllFontPaths,
+  loadFont,
   measureTextLine,
   parseInlineMarkup,
   wrapBalanced,
@@ -67,5 +69,46 @@ describe('font-metrics (opentype.js)', () => {
     const balanced = wrapBalanced(text, opts);
     expect(balanced.lines.length).toBeLessThanOrEqual(greedy.lines.length);
     expect(balanced.width).toBeLessThanOrEqual(greedy.width + 1);
+  });
+
+  it('clearFontCache() clears cached font instances', () => {
+    const first = loadFont('comic-bold');
+    expect(loadFont('comic-bold')).toBe(first);
+    clearFontCache();
+    const second = loadFont('comic-bold');
+    expect(second).not.toBe(first);
+    expect(measureTextLine('Test', 'comic-bold', 20)).toBeGreaterThan(0);
+  });
+
+  it('factors letterSpacing into wrapTextToWidth line-width and hard-break decisions', () => {
+    const text = 'Alpha Beta Gamma';
+    const maxWidth = 170;
+    const tight = wrapTextToWidth(text, {
+      fontSize: 18,
+      maxWidth,
+      fonts: FONT_SETS.modern,
+      letterSpacing: 0,
+    });
+    const spaced = wrapTextToWidth(text, {
+      fontSize: 18,
+      maxWidth,
+      fonts: FONT_SETS.modern,
+      letterSpacing: 8,
+    });
+    expect(spaced.lines.length).toBeGreaterThan(tight.lines.length);
+    for (const line of spaced.lines) {
+      expect(line.width).toBeLessThanOrEqual(maxWidth + 0.5);
+    }
+
+    const longWord = wrapTextToWidth('ABCDEFGHIJKLMN', {
+      fontSize: 18,
+      maxWidth: 100,
+      fonts: FONT_SETS.modern,
+      letterSpacing: 10,
+    });
+    expect(longWord.lines.length).toBeGreaterThan(1);
+    for (const line of longWord.lines) {
+      expect(line.width).toBeLessThanOrEqual(100 + 0.5);
+    }
   });
 });

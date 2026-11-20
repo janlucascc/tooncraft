@@ -48,6 +48,7 @@ export const PoseSchema = z.enum([
   'crouching',
   'dramatic-profile',
   'power-awakening',
+  'three-quarter',
 ]);
 export const ExpressionSchema = z.enum([
   'neutral',
@@ -159,7 +160,19 @@ export const EmotionBadgeLayerSchema = z.object({
  */
 export const ImageRefLayerSchema = z.object({
   type: z.literal('image_ref'),
-  src: z.string().min(1),
+  src: z
+    .string()
+    .min(1)
+    .refine(
+      (s) =>
+        !s.startsWith('/') &&
+        !s.startsWith('\\') &&
+        !/^[A-Za-z]:/.test(s) &&
+        !s.split(/[/\\]/).includes('..'),
+      {
+        message: 'image_ref src must be a relative path without ".." traversal segments or absolute/drive prefixes',
+      },
+    ),
   fit: z.enum(['cover', 'contain']).default('cover'),
   opacity: z.number().min(0).max(1).default(1),
   zIndex: z.number().int().default(15),

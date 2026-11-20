@@ -4,6 +4,7 @@ import { runValidate } from './commands/validate.js';
 import { type RenderFormatOption, runRender } from './commands/render.js';
 import { runInit } from './commands/init.js';
 import { runInspect } from './commands/inspect.js';
+import { runHeadSheet } from './commands/head-sheet.js';
 import type { ExportMode } from '../engine/image-exporter.js';
 
 const program = new Command();
@@ -86,7 +87,33 @@ program
     process.exitCode = runInspect(file, opts);
   });
 
+program
+  .command('head-sheet')
+  .description('Generate a 0°→90° turnaround QA sheet (shaded, silhouette, 3D guides) + optional reference comparison')
+  .option('-p, --preset <preset>', 'Character preset: lloyd | aria', 'lloyd')
+  .option('-o, --out <dir>', 'Output directory', './out/head-sheet')
+  .option('--ref <image>', 'Optional reference image path for side-by-side comparison')
+  .option('--yaw <deg>', 'Yaw angle for side-by-side portrait comparison', '34')
+  .option('--json', 'Emit machine-readable JSON report', false)
+  .action(
+    async (opts: { preset: string; out: string; ref?: string; yaw?: string; json?: boolean }) => {
+      process.exitCode = await runHeadSheet({
+        preset: opts.preset,
+        out: opts.out,
+        ref: opts.ref,
+        yaw: opts.yaw ? Number(opts.yaw) : 34,
+        json: opts.json,
+      });
+    },
+  );
+
+program.exitOverride();
 program.parseAsync(process.argv).catch((err: unknown) => {
+  const code = (err as { exitCode?: number })?.exitCode;
+  if (typeof code === 'number' && code === 0) {
+    process.exitCode = 0;
+    return;
+  }
   console.error(err instanceof Error ? err.message : String(err));
-  process.exitCode = 1;
+  process.exitCode = typeof code === 'number' ? code : 1;
 });

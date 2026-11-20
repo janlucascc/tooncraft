@@ -140,18 +140,20 @@ export function renderBubble(bubble: Bubble, ctx: BubbleRenderContext): string {
     chrome += el('path', { d: bodyPath, fill: '#000000', opacity: 0.35, transform: 'translate(4 4)' });
   }
 
-  chrome += tail.standaloneSvg;
-  chrome += tail.strokeSvg;
-  chrome += el('path', {
-    d: bodyPath,
-    fill: paint.fill,
-    stroke: paint.stroke,
-    'stroke-width': paint.strokeWidth,
-    'stroke-linejoin': 'round',
-    'stroke-dasharray': paint.dashArray,
-    filter: filterAttr,
-  });
-  chrome += tail.fillSvg;
+  const bubbleCore =
+    tail.standaloneSvg +
+    tail.strokeSvg +
+    el('path', {
+      d: bodyPath,
+      fill: paint.fill,
+      stroke: paint.stroke,
+      'stroke-width': paint.strokeWidth,
+      'stroke-linejoin': 'round',
+      'stroke-dasharray': paint.dashArray,
+    }) +
+    tail.fillSvg;
+
+  chrome += filterAttr ? `<g filter="${filterAttr}">${bubbleCore}</g>` : bubbleCore;
 
   // Extra decorative chrome for special bubble types.
   if (bubble.type === 'telepathy') {

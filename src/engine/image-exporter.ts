@@ -175,6 +175,7 @@ export async function exportToImages(
   }
 
   const bg = parseColor(composed.theme.scrollBackground);
+  const safePixelLimit = Math.max(268_402_689, width * totalHeight * 2);
   // Build raw RGBA buffer once so strip and all slices share a single composite pass.
   const rawComposite = await sharp({
     create: {
@@ -183,7 +184,7 @@ export async function exportToImages(
       channels: 4,
       background: { r: bg.r, g: bg.g, b: bg.b, alpha: 1 },
     },
-    limitInputPixels: false,
+    limitInputPixels: safePixelLimit,
   })
     .composite(composites)
     .raw()
@@ -198,7 +199,7 @@ export async function exportToImages(
 
   if (mode === 'strip' || mode === 'both') {
     const buf = await encodeImage(
-      sharp(rawComposite, { raw: rawInfo, limitInputPixels: false }),
+      sharp(rawComposite, { raw: rawInfo, limitInputPixels: safePixelLimit }),
       format,
       quality,
     );
@@ -217,7 +218,7 @@ export async function exportToImages(
 
     for (const r of ranges) {
       const buf = await encodeImage(
-        sharp(rawComposite, { raw: rawInfo, limitInputPixels: false }).extract({
+        sharp(rawComposite, { raw: rawInfo, limitInputPixels: safePixelLimit }).extract({
           left: 0,
           top: r.yStart,
           width,

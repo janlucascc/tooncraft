@@ -1,0 +1,311 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "O Primeiro Imortal — Teste Engine V4",
+  "episodeNumber": 1,
+  "author": "ToonCraft AI Director",
+  "genre": "Dark Fantasy / Action",
+  "synopsis": "Na era glacial, o caçador Krog toca o Núcleo Primordial para salvar sua tribo — e descobre que o preço da chama eterna é ver todos que amou virarem pó.",
+  "theme": "dark-fantasy",
+  "canvas": { "width": 800, "sliceMaxHeight": 1280 },
+  "narrativeArc": {
+    "emotionalAnchor": "Krog jurou manter o fogo da tribo aceso durante o inverno sem fim",
+    "centralConflict": "O Núcleo da Caverna oferece vida eterna, mas consome a mortalidade de quem o toca",
+    "protagonistChoice": "Krog crava a lança e absorve a chama primordial para sobreviver à nevasca",
+    "ironicCostOrTwist": "Milhares de anos depois, as cavernas deram lugar a florestas silenciosas — e só Krog continua vivo"
+  },
+  "cast": [
+    {
+      "id": "krog",
+      "name": "Krog",
+      "role": "protagonist",
+      "silhouettePreset": "primitive-hunter",
+      "eyeStyle": "sharp-hunter",
+      "hairStyle": "wild-primitive",
+      "accessories": ["bone-necklace", "fur-collar", "scar-eye"],
+      "narrativeProfile": {
+        "coreGoal": "Sobreviver ao inverno eterno e proteger a memória da tribo",
+        "woundOrFlaw": "Carrega séculos de solidão sem poder morrer",
+        "speechStyle": "Curto, grave e ancestral"
+      },
+      "palette": {
+        "skin": "#D6A884",
+        "hair": "#292524",
+        "eyes": "#F59E0B",
+        "outfitPrimary": "#78350F",
+        "outfitAccent": "#F59E0B",
+        "aura": "#38BDF8"
+      }
+    },
+    {
+      "id": "espirito",
+      "name": "Voz do Núcleo",
+      "role": "antagonist",
+      "silhouettePreset": "shadow-entity",
+      "eyeStyle": "mystic-glow",
+      "hairStyle": "hooded-shadow",
+      "accessories": [],
+      "palette": {
+        "skin": "#0F172A",
+        "hair": "#0F172A",
+        "eyes": "#38BDF8",
+        "outfitPrimary": "#090D16",
+        "outfitAccent": "#38BDF8",
+        "aura": "#38BDF8"
+      }
+    }
+  ],
+  "panels": [
+    {
+      "id": "p1-cavern-discovery",
+      "height": 680,
+      "camera": "establishing",
+      "moodDescription": "Krog ajoelhado diante do cristal primordial na caverna escura.",
+      "narrativeBeat": "hook",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 6 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#0F172A", "#1E1B4B"], "angleDeg": 180 },
+        { "type": "environment", "preset": "dungeon-cavern", "perspectiveY": 62, "accentColor": "#38BDF8", "fogOpacity": 0.4 },
+        {
+          "type": "character_figure",
+          "characterId": "krog",
+          "framing": "full-body",
+          "pose": "crouching",
+          "expression": "pain",
+          "position": { "x": 36, "y": 93 },
+          "scale": 0.85,
+          "rimLightColor": "#38BDF8",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "weaponProp": "stone-spear",
+          "zIndex": 20
+        },
+        {
+          "type": "character_figure",
+          "characterId": "espirito",
+          "framing": "waist-up",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "position": { "x": 76, "y": 82 },
+          "scale": 0.72,
+          "rimLightColor": "#38BDF8",
+          "lightDirection": "left",
+          "auraIntensity": 0.85,
+          "zIndex": 18
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b1",
+          "characterId": "espirito",
+          "type": "whisper",
+          "text": "Toca a pedra, caçador... e a morte nunca mais te alcançará.",
+          "position": { "x": 66, "y": 15 },
+          "tailTarget": { "x": 76, "y": 32 },
+          "maxWidth": 270,
+          "fontSize": 16
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p2-krog-decision",
+      "height": 620,
+      "camera": "close-up",
+      "moodDescription": "Close 3/4 em Krog encarando o cristal azul com determinação.",
+      "narrativeBeat": "catalyst",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 6 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#0F2942", "#090D16"] },
+        {
+          "type": "character_figure",
+          "characterId": "krog",
+          "framing": "close-up",
+          "pose": "three-quarter",
+          "expression": "determined",
+          "position": { "x": 52, "y": 98 },
+          "scale": 1.25,
+          "rimLightColor": "#38BDF8",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "zIndex": 20
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b2",
+          "characterId": "krog",
+          "type": "speech",
+          "text": "Se o fogo continuar aceso... eu pago o preço.",
+          "position": { "x": 30, "y": 14 },
+          "tailTarget": { "x": 45, "y": 34 },
+          "maxWidth": 255,
+          "fontSize": 17
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p3-immortality-surge",
+      "height": 740,
+      "camera": "medium",
+      "moodDescription": "A energia azul explode pelo corpo do caçador.",
+      "narrativeBeat": "climax-choice",
+      "frame": { "type": "shattered", "borderWidth": 5, "cornerRadius": 4 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#0EA5E9", "#1E3A8A", "#020617"] },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#BAE6FD", "intensity": 0.9, "center": { "x": 50, "y": 46 } },
+        {
+          "type": "character_figure",
+          "characterId": "krog",
+          "framing": "full-body",
+          "pose": "power-awakening",
+          "expression": "angry",
+          "glowEyes": true,
+          "position": { "x": 50, "y": 94 },
+          "scale": 0.92,
+          "rimLightColor": "#7DD3FC",
+          "lightDirection": "right",
+          "shadingIntensity": "dramatic-noir",
+          "auraIntensity": 0.95,
+          "weaponProp": "stone-spear",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "impact-flash", "color": "#FFFFFF", "intensity": 0.75, "center": { "x": 50, "y": 42 } }
+      ],
+      "bubbles": [
+        {
+          "id": "b3",
+          "characterId": "krog",
+          "type": "shout",
+          "text": "AAARGH!!",
+          "position": { "x": 50, "y": 12 },
+          "tailTarget": { "x": 50, "y": 26 },
+          "maxWidth": 180,
+          "fontSize": 22
+        }
+      ],
+      "sfx": [
+        { "id": "sfx1", "text": "KRA-KOOM!", "style": "impact", "position": { "x": 50, "y": 84 }, "fontSize": 42, "rotation": -5, "color": "#38BDF8" }
+      ]
+    },
+    {
+      "id": "p4-eyes-awakening",
+      "height": 340,
+      "camera": "close-up",
+      "moodDescription": "Os olhos de Krog se acendem em chama imortal.",
+      "narrativeBeat": "climax-choice",
+      "frame": { "type": "borderless", "borderWidth": 0, "cornerRadius": 0 },
+      "pacingAfter": "breath",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#0C4A6E", "#020617"], "angleDeg": 90 },
+        { "type": "effect", "kind": "speedlines-radial", "color": "#38BDF8", "intensity": 0.75, "center": { "x": 50, "y": 50 } },
+        {
+          "type": "character_figure",
+          "characterId": "krog",
+          "framing": "eyes-only",
+          "pose": "standing",
+          "expression": "menacing-glow",
+          "glowEyes": true,
+          "position": { "x": 50, "y": 95 },
+          "scale": 1.1,
+          "rimLightColor": "#38BDF8",
+          "lightDirection": "right",
+          "zIndex": 20
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b4",
+          "type": "narration",
+          "text": "O inverno acabou. A tribo partiu. Só o fogo dentro dele ficou.",
+          "position": { "x": 50, "y": 80 },
+          "maxWidth": 520,
+          "fontSize": 17
+        }
+      ],
+      "sfx": [
+        { "id": "sfx2", "text": "ZING!", "style": "slash", "position": { "x": 82, "y": 24 }, "fontSize": 34, "rotation": 8, "color": "#7DD3FC" }
+      ]
+    },
+    {
+      "id": "p5-centuries-later",
+      "height": 680,
+      "camera": "wide",
+      "moodDescription": "Séculos depois, Krog sob a chuva na floresta noturna.",
+      "narrativeBeat": "tragic-twist",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 6 },
+      "pacingAfter": "tight",
+      "layers": [
+        { "type": "backdrop", "kind": "linear-gradient", "colors": ["#020617", "#0F172A", "#1E293B"], "angleDeg": 180 },
+        { "type": "environment", "preset": "dark-forest", "perspectiveY": 65, "accentColor": "#94A3B8", "fogOpacity": 0.45 },
+        {
+          "type": "character_figure",
+          "characterId": "krog",
+          "framing": "waist-up",
+          "pose": "three-quarter",
+          "expression": "neutral",
+          "position": { "x": 46, "y": 94 },
+          "scale": 0.92,
+          "rimLightColor": "#94A3B8",
+          "lightDirection": "right",
+          "shadingIntensity": "heavy",
+          "weaponProp": "stone-spear",
+          "zIndex": 20
+        },
+        { "type": "effect", "kind": "rain", "color": "#BAE6FD", "intensity": 0.5 }
+      ],
+      "bubbles": [
+        {
+          "id": "b5",
+          "type": "narration",
+          "text": "Dez mil invernos depois... ninguém mais lembra o nome da minha tribo.",
+          "position": { "x": 50, "y": 14 },
+          "maxWidth": 480,
+          "fontSize": 17
+        }
+      ],
+      "sfx": []
+    },
+    {
+      "id": "p6-final-close",
+      "height": 580,
+      "camera": "close-up",
+      "moodDescription": "Close 3/4 final de Krog encarando o horizonte eterno.",
+      "narrativeBeat": "cliffhanger",
+      "frame": { "type": "standard", "borderWidth": 4, "cornerRadius": 6 },
+      "pacingAfter": "normal",
+      "layers": [
+        { "type": "backdrop", "kind": "radial-gradient", "colors": ["#1E293B", "#020617"] },
+        {
+          "type": "character_figure",
+          "characterId": "krog",
+          "framing": "close-up",
+          "pose": "three-quarter",
+          "expression": "smirk",
+          "position": { "x": 52, "y": 98 },
+          "scale": 1.25,
+          "rimLightColor": "#F59E0B",
+          "lightDirection": "right",
+          "shadingIntensity": "standard",
+          "zIndex": 20
+        }
+      ],
+      "bubbles": [
+        {
+          "id": "b6",
+          "characterId": "krog",
+          "type": "speech",
+          "text": "Mas eu ainda estou aqui.",
+          "position": { "x": 30, "y": 16 },
+          "tailTarget": { "x": 46, "y": 36 },
+          "maxWidth": 240,
+          "fontSize": 18
+        }
+      ],
+      "sfx": []
+    }
+  ]
+}

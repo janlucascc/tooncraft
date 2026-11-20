@@ -118,7 +118,7 @@ export function glowFilter(id: string, stdDeviation: number, color?: string, str
   const flood = color
     ? `<feFlood flood-color="${escapeXml(color)}" flood-opacity="${fmt(strength)}" result="c"/><feComposite in="c" in2="b" operator="in" result="b"/>`
     : '';
-  return `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="${fmt(stdDeviation)}" result="b"/>${flood}<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  return `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="${fmt(stdDeviation)}" result="b"/>${flood}<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
 }
 
 /** Simple gaussian blur filter. */

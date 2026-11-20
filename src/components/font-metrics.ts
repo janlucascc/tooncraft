@@ -95,6 +95,11 @@ export function getAllFontPaths(): string[] {
 
 const fontCache = new Map<FontKey, opentype.Font>();
 
+/** Clear the in-memory parsed font cache (useful for tests or memory-bounded runs). */
+export function clearFontCache(): void {
+  fontCache.clear();
+}
+
 export function loadFont(key: FontKey): opentype.Font {
   const cached = fontCache.get(key);
   if (cached) return cached;
@@ -217,19 +222,25 @@ function mergeRuns(runs: TextRun[]): TextRun[] {
 }
 
 function measureRuns(runs: TextRun[], o: WrapOptions): number {
-  return runs.reduce(
-    (sum, r) => sum + measureTextLine(r.text, fontFor(r.style, o.fonts), o.fontSize, o.letterSpacing ?? 0),
-    0,
-  );
+  const ls = o.letterSpacing ?? 0;
+  let total = 0;
+  for (let i = 0; i < runs.length; i++) {
+    total += measureTextLine(runs[i]!.text, fontFor(runs[i]!.style, o.fonts), o.fontSize, ls);
+    if (i > 0 && runs[i]!.text.length > 0 && runs[i - 1]!.text.length > 0) {
+      total += ls;
+    }
+  }
+  return total;
 }
 
 /** Split a token that is wider than maxWidth into character chunks. */
 function hardBreak(token: Token, o: WrapOptions): Token[] {
   const out: Token[] = [];
+  const ls = o.letterSpacing ?? 0;
   let current = '';
   for (const ch of [...token.text]) {
     const candidate = current + ch;
-    if (current && measureTextLine(candidate, fontFor(token.style, o.fonts), o.fontSize) > o.maxWidth) {
+    if (current && measureTextLine(candidate, fontFor(token.style, o.fonts), o.fontSize, ls) > o.maxWidth) {
       out.push({ ...token, text: current });
       current = ch;
     } else current = candidate;

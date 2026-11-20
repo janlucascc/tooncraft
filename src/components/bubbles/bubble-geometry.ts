@@ -171,11 +171,15 @@ function shoutShape(cx: number, cy: number, rx: number, ry: number, seed: string
   const prng = createPrng(`shout-${seed}`);
   const spikes = Math.max(14, Math.min(24, Math.round((rx + ry) / 14)));
   const total = spikes * 2;
+  const step = (Math.PI * 2) / total;
+  const maxJitter = Math.min(0.04, step * 0.25);
+  const innerMin = Math.max(0.76, Math.cos(step) * 0.82);
+  const innerMax = Math.max(innerMin + 0.04, 0.86);
   let d = '';
   for (let i = 0; i < total; i++) {
-    const a = (i / total) * Math.PI * 2 + prng.range(-0.04, 0.04);
+    const a = i * step + prng.range(-maxJitter, maxJitter);
     const isOuter = i % 2 === 0;
-    const rScale = isOuter ? prng.range(1.02, 1.18) : prng.range(0.76, 0.86);
+    const rScale = isOuter ? prng.range(1.02, 1.18) : prng.range(innerMin, innerMax);
     const x = cx + Math.cos(a) * rx * rScale;
     const y = cy + Math.sin(a) * ry * rScale;
     d += `${i === 0 ? 'M' : 'L'}${fmt(x)} ${fmt(y)}`;

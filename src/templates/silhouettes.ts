@@ -10,13 +10,33 @@ import {
   glowFilter,
   lighten,
   linearGradient,
+  mix,
   pctPoint,
   radialGradient,
 } from '../components/svg-utils.js';
 import { sanitizeSvgMarkup } from '../components/scenes/svg-sanitizer.js';
 import { createPrng } from '../engine/prng.js';
 import {
+  anatomicalBootPath,
+  anatomicalCastingHand,
+  anatomicalChinThinkHand,
+  anatomicalHandDetailPath,
+  anatomicalHandPath,
+  anatomicalRelaxedHand,
+  anatomicalTorsoPath,
+  anatomicalWeaponGripFingers,
+  buildAnatomicalArm,
+  buildAnatomicalLeg,
+  buildForearmWrapPath,
+  lerpP,
+  sub,
+  taperedCurvePath,
+  unit,
+} from './anatomy-bezier.js';
+import { renderParametricHead3D } from './head-3d.js';
+import {
   MANHWA_FACE_FRONT,
+  MANHWA_FACE_FRONT_FEMALE,
   MANHWA_FACE_PROFILE,
   type P,
   poly,
@@ -54,13 +74,15 @@ import {
 interface Part {
   d: string;
   fill: string;
+  /** Optional fill opacity (used for cel-shadow ribbons & G-pen tapered creases). */
+  fillOpacity?: number;
   /** Participates in rim-light and shade passes (default true). */
   body?: boolean;
   /** Extra raw attributes for the base pass. */
   attrs?: Record<string, string | number | undefined>;
   /** Skip the ink outline. */
   noStroke?: boolean;
-  /** Override stroke color (detail lines drawn on top, e.g. finger grooves). */
+  /** Override stroke color (e.g. warm skin ink or detail lines). */
   stroke?: string;
   /** Stroke width used when `stroke` is set (local units). */
   strokeWidth?: number;
@@ -68,14 +90,14 @@ interface Part {
 
 /** Local-space crop per framing: [top, bottom] and fraction of panel height to fill. */
 const FRAMING_CROP: Record<Framing, { top: number; bottom: number; fill: number }> = {
-  'full-body': { top: -632, bottom: 12, fill: 0.88 },
-  'waist-up': { top: -632, bottom: -278, fill: 0.96 },
-  bust: { top: -626, bottom: -385, fill: 0.97 },
-  'close-up': { top: -614, bottom: -452, fill: 0.98 },
-  'eyes-only': { top: -558, bottom: -508, fill: 1 },
+  'full-body': { top: -608, bottom: 12, fill: 0.88 },
+  'waist-up': { top: -608, bottom: -298, fill: 0.96 },
+  bust: { top: -606, bottom: -395, fill: 0.97 },
+  'close-up': { top: -600, bottom: -462, fill: 0.98 },
+  'eyes-only': { top: -546, bottom: -498, fill: 1 },
 };
 
-const REF_HIP_Y = -262;
+const REF_HIP_Y = -288;
 
 interface Skeleton {
   hip: P;
@@ -92,51 +114,163 @@ interface Skeleton {
   shoulderHalf: number;
 }
 
-function skeletonFor(pose: Pose): Skeleton {
+function skeletonFor(pose: Pose, isSlender: boolean = false, isHeavy: boolean = false): Skeleton {
+  if (isSlender) {
+    switch (pose) {
+      case 'action-lunge':
+        return {
+          hip: { x: 0, y: -235 },
+          lean: 12,
+          armBack: [{ x: -50, y: -452 }, { x: -102, y: -390 }, { x: -145, y: -340 }],
+          armFront: [{ x: 50, y: -452 }, { x: 122, y: -468 }, { x: 195, y: -475 }],
+          legBack: [{ x: -20, y: -235 }, { x: -74, y: -125 }, { x: -135, y: -16 }],
+          legFront: [{ x: 20, y: -235 }, { x: 84, y: -155 }, { x: 96, y: -16 }],
+          backArmBehind: true,
+          shoulderHalf: 52,
+        };
+      case 'power-awakening':
+        return {
+          hip: { x: 0, y: -268 },
+          lean: -2,
+          armBack: [{ x: -52, y: -452 }, { x: -94, y: -385 }, { x: -118, y: -310 }],
+          armFront: [{ x: 52, y: -452 }, { x: 94, y: -385 }, { x: 118, y: -310 }],
+          legBack: [{ x: -22, y: -268 }, { x: -38, y: -142 }, { x: -48, y: -14 }],
+          legFront: [{ x: 22, y: -268 }, { x: 38, y: -142 }, { x: 48, y: -14 }],
+          backArmBehind: false,
+          shoulderHalf: 54,
+        };
+      case 'crouching':
+        return {
+          hip: { x: 0, y: -165 },
+          lean: 8,
+          armBack: [{ x: -50, y: -452 }, { x: -74, y: -365 }, { x: -82, y: -285 }],
+          armFront: [{ x: 50, y: -452 }, { x: 84, y: -375 }, { x: 68, y: -305 }],
+          legBack: [{ x: -20, y: -165 }, { x: -58, y: -120 }, { x: -36, y: -16 }],
+          legFront: [{ x: 20, y: -165 }, { x: 68, y: -180 }, { x: 60, y: -16 }],
+          backArmBehind: false,
+          shoulderHalf: 52,
+        };
+      case 'dramatic-profile':
+        return {
+          hip: { x: 0, y: REF_HIP_Y },
+          lean: 2,
+          armBack: [{ x: -38, y: -452 }, { x: -52, y: -355 }, { x: -44, y: -260 }],
+          armFront: [{ x: 38, y: -452 }, { x: 52, y: -355 }, { x: 44, y: -260 }],
+          legBack: [{ x: -16, y: REF_HIP_Y }, { x: -18, y: -152 }, { x: -20, y: -14 }],
+          legFront: [{ x: 16, y: REF_HIP_Y }, { x: 18, y: -152 }, { x: 20, y: -14 }],
+          backArmBehind: true,
+          shoulderHalf: 42,
+        };
+      case 'three-quarter':
+        return {
+          hip: { x: 0, y: REF_HIP_Y },
+          lean: -3,
+          armBack: [{ x: -46, y: -452 }, { x: -56, y: -355 }, { x: -48, y: -260 }],
+          armFront: [{ x: 34, y: -452 }, { x: 40, y: -355 }, { x: 34, y: -260 }],
+          legBack: [{ x: -18, y: REF_HIP_Y }, { x: -20, y: -152 }, { x: -22, y: -14 }],
+          legFront: [{ x: 18, y: REF_HIP_Y }, { x: 20, y: -152 }, { x: 22, y: -14 }],
+          backArmBehind: true,
+          shoulderHalf: 44,
+        };
+      case 'facing-away':
+      case 'standing':
+      default:
+        return {
+          hip: { x: 0, y: REF_HIP_Y },
+          lean: 0,
+          armBack: [{ x: -50, y: -452 }, { x: -58, y: -355 }, { x: -52, y: -260 }],
+          armFront: [{ x: 50, y: -452 }, { x: 58, y: -355 }, { x: 52, y: -260 }],
+          legBack: [{ x: -20, y: REF_HIP_Y }, { x: -22, y: -152 }, { x: -24, y: -14 }],
+          legFront: [{ x: 20, y: REF_HIP_Y }, { x: 22, y: -152 }, { x: 24, y: -14 }],
+          backArmBehind: false,
+          shoulderHalf: 52,
+        };
+    }
+  }
+
+  if (isHeavy) {
+    switch (pose) {
+      case 'power-awakening':
+        return {
+          hip: { x: 0, y: -268 },
+          lean: -3,
+          armBack: [{ x: -78, y: -452 }, { x: -132, y: -395 }, { x: -168, y: -315 }],
+          armFront: [{ x: 78, y: -452 }, { x: 132, y: -395 }, { x: 168, y: -315 }],
+          legBack: [{ x: -32, y: -268 }, { x: -54, y: -142 }, { x: -68, y: -14 }],
+          legFront: [{ x: 32, y: -268 }, { x: 54, y: -142 }, { x: 68, y: -14 }],
+          backArmBehind: false,
+          shoulderHalf: 82,
+        };
+      case 'standing':
+      default:
+        return {
+          hip: { x: 0, y: REF_HIP_Y },
+          lean: 0,
+          armBack: [{ x: -78, y: -452 }, { x: -92, y: -355 }, { x: -84, y: -260 }],
+          armFront: [{ x: 78, y: -452 }, { x: 92, y: -355 }, { x: 84, y: -260 }],
+          legBack: [{ x: -32, y: REF_HIP_Y }, { x: -36, y: -152 }, { x: -40, y: -14 }],
+          legFront: [{ x: 32, y: REF_HIP_Y }, { x: 36, y: -152 }, { x: 40, y: -14 }],
+          backArmBehind: false,
+          shoulderHalf: 82,
+        };
+    }
+  }
+
   switch (pose) {
     case 'action-lunge':
       return {
-        hip: { x: 0, y: -215 },
+        hip: { x: 0, y: -235 },
         lean: 14,
-        armBack: [{ x: -76, y: -452 }, { x: -142, y: -385 }, { x: -196, y: -330 }],
-        armFront: [{ x: 76, y: -452 }, { x: 172, y: -468 }, { x: 262, y: -478 }],
-        legBack: [{ x: -28, y: -215 }, { x: -98, y: -112 }, { x: -168, y: -16 }],
-        legFront: [{ x: 28, y: -215 }, { x: 108, y: -142 }, { x: 122, y: -16 }],
+        armBack: [{ x: -68, y: -452 }, { x: -130, y: -385 }, { x: -180, y: -330 }],
+        armFront: [{ x: 68, y: -452 }, { x: 156, y: -468 }, { x: 238, y: -478 }],
+        legBack: [{ x: -26, y: -235 }, { x: -88, y: -125 }, { x: -152, y: -16 }],
+        legFront: [{ x: 26, y: -235 }, { x: 98, y: -155 }, { x: 110, y: -16 }],
         backArmBehind: true,
-        shoulderHalf: 80,
+        shoulderHalf: 70,
       };
     case 'power-awakening':
       return {
-        hip: { x: 0, y: -245 },
+        hip: { x: 0, y: -268 },
         lean: -4,
-        armBack: [{ x: -78, y: -452 }, { x: -142, y: -395 }, { x: -178, y: -315 }],
-        armFront: [{ x: 78, y: -452 }, { x: 142, y: -395 }, { x: 178, y: -315 }],
-        legBack: [{ x: -34, y: -245 }, { x: -58, y: -125 }, { x: -74, y: -14 }],
-        legFront: [{ x: 34, y: -245 }, { x: 58, y: -125 }, { x: 74, y: -14 }],
+        armBack: [{ x: -70, y: -452 }, { x: -124, y: -395 }, { x: -158, y: -315 }],
+        armFront: [{ x: 70, y: -452 }, { x: 124, y: -395 }, { x: 158, y: -315 }],
+        legBack: [{ x: -30, y: -268 }, { x: -52, y: -142 }, { x: -66, y: -14 }],
+        legFront: [{ x: 30, y: -268 }, { x: 52, y: -142 }, { x: 66, y: -14 }],
         backArmBehind: false,
-        shoulderHalf: 82,
+        shoulderHalf: 72,
       };
     case 'crouching':
       return {
-        hip: { x: 0, y: -150 },
+        hip: { x: 0, y: -165 },
         lean: 9,
-        armBack: [{ x: -76, y: -452 }, { x: -102, y: -362 }, { x: -112, y: -275 }],
-        armFront: [{ x: 76, y: -452 }, { x: 114, y: -372 }, { x: 92, y: -300 }],
-        legBack: [{ x: -28, y: -150 }, { x: -72, y: -112 }, { x: -44, y: -16 }],
-        legFront: [{ x: 28, y: -150 }, { x: 84, y: -176 }, { x: 74, y: -16 }],
+        armBack: [{ x: -68, y: -452 }, { x: -94, y: -365 }, { x: -102, y: -285 }],
+        armFront: [{ x: 68, y: -452 }, { x: 104, y: -375 }, { x: 84, y: -305 }],
+        legBack: [{ x: -26, y: -165 }, { x: -66, y: -120 }, { x: -40, y: -16 }],
+        legFront: [{ x: 26, y: -165 }, { x: 76, y: -180 }, { x: 68, y: -16 }],
         backArmBehind: false,
-        shoulderHalf: 80,
+        shoulderHalf: 70,
       };
     case 'dramatic-profile':
       return {
         hip: { x: 0, y: REF_HIP_Y },
         lean: 2,
-        armBack: [{ x: -52, y: -452 }, { x: -72, y: -348 }, { x: -56, y: -246 }],
-        armFront: [{ x: 52, y: -452 }, { x: 72, y: -348 }, { x: 56, y: -246 }],
-        legBack: [{ x: -22, y: REF_HIP_Y }, { x: -24, y: -135 }, { x: -26, y: -14 }],
-        legFront: [{ x: 22, y: REF_HIP_Y }, { x: 26, y: -135 }, { x: 30, y: -14 }],
+        armBack: [{ x: -48, y: -452 }, { x: -66, y: -355 }, { x: -52, y: -260 }],
+        armFront: [{ x: 48, y: -452 }, { x: 66, y: -355 }, { x: 52, y: -260 }],
+        legBack: [{ x: -20, y: REF_HIP_Y }, { x: -22, y: -152 }, { x: -24, y: -14 }],
+        legFront: [{ x: 20, y: REF_HIP_Y }, { x: 22, y: -152 }, { x: 24, y: -14 }],
         backArmBehind: true,
-        shoulderHalf: 58,
+        shoulderHalf: 54,
+      };
+    case 'three-quarter':
+      return {
+        hip: { x: 0, y: REF_HIP_Y },
+        lean: -3,
+        armBack: [{ x: -58, y: -452 }, { x: -68, y: -355 }, { x: -60, y: -260 }],
+        armFront: [{ x: 42, y: -452 }, { x: 48, y: -355 }, { x: 42, y: -260 }],
+        legBack: [{ x: -24, y: REF_HIP_Y }, { x: -26, y: -152 }, { x: -28, y: -14 }],
+        legFront: [{ x: 24, y: REF_HIP_Y }, { x: 26, y: -152 }, { x: 28, y: -14 }],
+        backArmBehind: true,
+        shoulderHalf: 56,
       };
     case 'facing-away':
     case 'standing':
@@ -144,13 +278,12 @@ function skeletonFor(pose: Pose): Skeleton {
       return {
         hip: { x: 0, y: REF_HIP_Y },
         lean: 0,
-        // Natural A-pose: elbows bow slightly outward, fists rest beside the hips.
-        armBack: [{ x: -76, y: -452 }, { x: -98, y: -348 }, { x: -80, y: -246 }],
-        armFront: [{ x: 76, y: -452 }, { x: 98, y: -348 }, { x: 80, y: -246 }],
-        legBack: [{ x: -30, y: REF_HIP_Y }, { x: -34, y: -135 }, { x: -38, y: -14 }],
-        legFront: [{ x: 30, y: REF_HIP_Y }, { x: 34, y: -135 }, { x: 38, y: -14 }],
+        armBack: [{ x: -68, y: -452 }, { x: -76, y: -355 }, { x: -70, y: -260 }],
+        armFront: [{ x: 68, y: -452 }, { x: 76, y: -355 }, { x: 70, y: -260 }],
+        legBack: [{ x: -28, y: REF_HIP_Y }, { x: -30, y: -152 }, { x: -32, y: -14 }],
+        legFront: [{ x: 28, y: REF_HIP_Y }, { x: 30, y: -152 }, { x: 32, y: -14 }],
         backArmBehind: false,
-        shoulderHalf: 80,
+        shoulderHalf: 70,
       };
   }
 }
@@ -159,98 +292,17 @@ function skeletonFor(pose: Pose): Skeleton {
 // Geometry helpers
 // ---------------------------------------------------------------------------
 
-/** Tapered limb through joints, with round caps. */
-function limbPath(pts: P[], widths: number[]): string {
-  const n = pts.length;
-  const left: P[] = [];
-  const right: P[] = [];
-  for (let i = 0; i < n; i++) {
-    const prev = pts[Math.max(0, i - 1)]!;
-    const next = pts[Math.min(n - 1, i + 1)]!;
-    const dx = next.x - prev.x;
-    const dy = next.y - prev.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const nx = -dy / len;
-    const ny = dx / len;
-    const w = (widths[i] ?? widths[widths.length - 1] ?? 10) / 2;
-    left.push({ x: pts[i]!.x + nx * w, y: pts[i]!.y + ny * w });
-    right.push({ x: pts[i]!.x - nx * w, y: pts[i]!.y - ny * w });
-  }
-  const wEnd = (widths[n - 1] ?? 10) / 2;
-  const wStart = (widths[0] ?? 10) / 2;
-  let d = `M${fmt(left[0]!.x)} ${fmt(left[0]!.y)}`;
-  for (let i = 1; i < n; i++) d += `L${fmt(left[i]!.x)} ${fmt(left[i]!.y)}`;
-  d += `A${fmt(wEnd)} ${fmt(wEnd)} 0 0 0 ${fmt(right[n - 1]!.x)} ${fmt(right[n - 1]!.y)}`;
-  for (let i = n - 2; i >= 0; i--) d += `L${fmt(right[i]!.x)} ${fmt(right[i]!.y)}`;
-  d += `A${fmt(wStart)} ${fmt(wStart)} 0 0 0 ${fmt(left[0]!.x)} ${fmt(left[0]!.y)}Z`;
-  return d;
-}
-
-/** Outward tilt (deg) applied to every fist so hanging hands angle away from the body. */
-const HAND_TILT_DEG = -12;
-
-/** Mirror + rotate a local hand-space point around the wrist center. */
-function handPoint(local: P, c: P, r: number, side: number, tiltDeg: number = HAND_TILT_DEG): P {
-  const a = (tiltDeg * Math.PI) / 180;
-  const cos = Math.cos(a);
-  const sin = Math.sin(a);
-  return {
-    x: c.x + side * (local.x * cos - local.y * sin) * r,
-    y: c.y + (local.x * sin + local.y * cos) * r,
-  };
-}
-
-/**
- * Stylized closed fist: palm mass, thumb capsule on the inner side and two
- * knuckle grooves at the bottom — sculpted enough to still read as a hand at
- * small render scales (the previous hexagon blob collapsed into a ball).
- */
-function sculptedHandPath(c: P, r: number, side: number): string {
-  const outline: P[] = [
-    { x: -0.78, y: -1.02 }, // wrist (back of hand)
-    { x: 0.62, y: -0.98 }, // knuckle ridge
-    { x: 1.08, y: -0.3 }, // fingertip (back edge)
-    { x: 1.02, y: 0.58 }, // fingertip (front edge)
-    { x: 0.42, y: 0.34 }, // groove between fingers
-    { x: 0.08, y: 0.92 }, // palm-base groove
-    { x: -0.5, y: 0.62 }, // heel
-    { x: -0.88, y: -0.12 }, // thumb base (inner side)
-    { x: -1.22, y: -0.5 }, // thumb tip
-    { x: -1.02, y: -0.8 }, // thumb base (upper)
-  ];
-  return poly(outline.map((p) => handPoint(p, c, r, side)));
-}
-
-/** Finger/knuckle grooves stroked over the fist (never receives rim/shade passes). */
-function handDetailPath(c: P, r: number, side: number): string {
-  const lines: P[][] = [
-    [
-      { x: -0.55, y: 0.5 },
-      { x: 0.78, y: 0.42 },
-    ], // groove across the fingers
-    [
-      { x: -0.3, y: 0.05 },
-      { x: 0.95, y: -0.02 },
-    ], // secondary groove
-    [
-      { x: -0.6, y: -0.82 },
-      { x: 0.95, y: -0.62 },
-    ], // knuckle ridge line
-  ];
-  return lines
-    .map((line) => {
-      const p1 = handPoint(line[0]!, c, r, side);
-      const p2 = handPoint(line[1]!, c, r, side);
-      return `M${fmt(p1.x)} ${fmt(p1.y)}L${fmt(p2.x)} ${fmt(p2.y)}`;
-    })
-    .join('');
-}
-
-const ellipsePath = (c: P, rx: number, ry: number) =>
-  `M${fmt(c.x - rx)} ${fmt(c.y)}a${fmt(rx)} ${fmt(ry)} 0 1 0 ${fmt(rx * 2)} 0a${fmt(rx)} ${fmt(ry)} 0 1 0 ${fmt(-rx * 2)} 0Z`;
-
-function lerp(a: P, b: P, t: number): P {
-  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+/** Sculpted curved anime armor shoulder pauldron (replaces flat ellipse). */
+function armorPauldronPath(cx: number, cy: number, side: number): string {
+  const x = (dx: number) => fmt(cx + dx * side);
+  const y = (dy: number) => fmt(cy + dy);
+  return (
+    `M${x(-22)} ${y(-12)}` +
+    `Q${x(4)} ${y(-28)} ${x(30)} ${y(-10)}` +
+    `C${x(40)} ${y(-2)} ${x(38)} ${y(16)} ${x(22)} ${y(24)}` +
+    `Q${x(4)} ${y(16)} ${x(-18)} ${y(14)}` +
+    `Q${x(-28)} ${y(2)} ${x(-22)} ${y(-12)}Z`
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -312,18 +364,6 @@ function outfitFor(preset: SilhouettePreset): OutfitStyle {
   }
 }
 
-function torsoPath(half: number): string {
-  const k = half / 78;
-  const x = (v: number) => fmt(v * k);
-  return (
-    `M${x(-14)} -472C${x(-42)} -470 ${x(-72)} -468 ${x(-82)} -454` +
-    `C${x(-90)} -432 ${x(-80)} -402 ${x(-70)} -382C${x(-62)} -352 ${x(-52)} -322 ${x(-50)} -302` +
-    `C${x(-54)} -286 ${x(-60)} -274 ${x(-60)} -258L${x(60)} -258` +
-    `C${x(60)} -274 ${x(54)} -286 ${x(50)} -302C${x(52)} -322 ${x(62)} -352 ${x(70)} -382` +
-    `C${x(80)} -402 ${x(90)} -432 ${x(82)} -454C${x(72)} -468 ${x(42)} -470 ${x(14)} -472Z`
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Main renderer
 // ---------------------------------------------------------------------------
@@ -343,8 +383,10 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   const outfit = outfitFor(character.silhouettePreset);
   const hairStyle = resolveHairStyle(character.hairStyle, character.silhouettePreset);
   const accessories = character.accessories ?? [];
+  const isSlender = character.eyeStyle === 'soft-shojo' || character.hairStyle === 'long-flowing';
+  const isHeavy = outfit.armor;
   const prng = createPrng(`${ctx.seed}-${character.id}`);
-  const sk = skeletonFor(layer.pose);
+  const sk = skeletonFor(layer.pose, isSlender, isHeavy);
   const crop = FRAMING_CROP[layer.framing];
 
   // Scale: fit crop height into the panel, honor layer.scale, keep heads sane.
@@ -360,18 +402,23 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   const isEntity = outfit.entity;
   const away = layer.pose === 'facing-away';
   const profile = layer.pose === 'dramatic-profile';
+  const threeQuarter = layer.pose === 'three-quarter';
   const rim = layer.rimLightColor ?? (isEntity ? palette.aura : ctx.defaultRim);
   const shading = layer.shadingIntensity ?? 'standard';
   const lightDir = layer.lightDirection ?? 'left';
+  const shadowSide = lightDir === 'right' ? -1 : 1;
 
-  // Palette derivations.
+  // Palette derivations (anime-tinted warm lineart for skin, deep shaded ink for outfits).
   const skin = isEntity ? '#07060C' : palette.skin;
   const outfitMain = isEntity ? '#07060C' : palette.outfitPrimary;
-  const pants = isEntity ? '#07060C' : outfit.primitive ? darken(skin, 0.05) : darken(palette.outfitPrimary, 0.35);
+  const pants = isEntity ? '#07060C' : outfit.primitive ? darken(skin, 0.04) : darken(palette.outfitPrimary, 0.35);
   const shoes = isEntity ? '#07060C' : darken(palette.outfitPrimary, 0.7);
   const hair = isEntity ? '#07060C' : palette.hair;
   const accent = palette.outfitAccent;
   const ink = isEntity ? '#000000' : darken(outfitMain, 0.78);
+  const skinInk = isEntity ? '#000000' : mix(darken(skin, 0.68), ink, 0.42);
+  const celAlpha =
+    shading === 'soft' ? 0.55 : shading === 'heavy' ? 0.82 : shading === 'dramatic-noir' ? 0.9 : 0.72;
 
   const upperShift = sk.hip.y - REF_HIP_Y;
   const upperTransform = `translate(${fmt(sk.hip.x)} ${fmt(upperShift)}) rotate(${fmt(sk.lean)} 0 ${REF_HIP_Y})`;
@@ -383,18 +430,41 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   const upperParts: Part[] = [];
   const upperFront: Part[] = [];
 
-  // Legs.
-  const legW = outfit.gi ? [54, 46, 34] : [46, 36, 22];
+  // Legs (organic cubic Bézier quads → knee → calf → ankle + cel-shadow ribbons + sculpted boots).
+  const legBulk = outfit.gi ? 1.15 : isSlender ? 0.88 : outfit.armor ? 1.12 : 1.0;
   if (!outfit.robe) {
-    legParts.push({ d: limbPath(sk.legBack, legW), fill: darken(pants, 0.14) });
-    legParts.push({ d: limbPath(sk.legFront, legW), fill: pants });
-    // Shin wraps for primitive hunter or martial artist
-    if (outfit.primitive || outfit.gi) {
-      for (const leg of [sk.legBack, sk.legFront]) {
-        const shinTop = lerp(leg[1], leg[2], 0.35);
+    const legSpecs: ReadonlyArray<{ leg: [P, P, P]; side: number; base: string }> = [
+      { leg: sk.legBack, side: -1, base: darken(pants, 0.12) },
+      { leg: sk.legFront, side: 1, base: pants },
+    ];
+    for (const { leg, side, base } of legSpecs) {
+      const geo = buildAnatomicalLeg(leg[0], leg[1], leg[2], side, legBulk, shadowSide);
+      legParts.push({
+        d: geo.silhouette,
+        fill: base,
+        stroke: outfit.primitive ? skinInk : ink,
+      });
+      if (!isEntity) {
         legParts.push({
-          d: limbPath([shinTop, leg[2]], [30, 24]),
-          fill: darken(outfitMain, 0.25),
+          d: geo.celShadow,
+          fill: darken(base, 0.24),
+          fillOpacity: celAlpha,
+          noStroke: true,
+          body: false,
+        });
+        legParts.push({
+          d: geo.anatomyCreases,
+          fill: darken(base, 0.46),
+          fillOpacity: 0.72,
+          noStroke: true,
+          body: false,
+        });
+      }
+      // Tapered shin wraps / leg bindings for primitive hunter or martial artist
+      if (outfit.primitive || outfit.gi) {
+        legParts.push({
+          d: buildForearmWrapPath(leg[1], leg[2], side, 0.36, 0.98, 29, 20),
+          fill: darken(outfitMain, side < 0 ? 0.32 : 0.24),
         });
       }
     }
@@ -402,34 +472,34 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   for (const leg of [sk.legBack, sk.legFront]) {
     const a = leg[2];
     const dir = leg === sk.legFront ? 1 : -1;
-    legParts.push({ d: ellipsePath({ x: a.x + dir * 8, y: a.y + 4 }, 22, 11), fill: shoes });
+    legParts.push({ d: anatomicalBootPath(a, dir), fill: shoes });
   }
   // Pelvis / Loincloth.
   if (!outfit.robe) {
     const h = sk.hip;
     if (outfit.primitive) {
-      // Jagged beast-hide loincloth skirt
+      // Curved organic beast-hide loincloth skirt
       legParts.push({
-        d: poly([
-          { x: h.x - 62, y: h.y - 16 },
-          { x: h.x + 62, y: h.y - 16 },
-          { x: h.x + 68, y: h.y + 52 },
-          { x: h.x + 42, y: h.y + 34 },
-          { x: h.x + 18, y: h.y + 68 },
-          { x: h.x - 6, y: h.y + 40 },
-          { x: h.x - 32, y: h.y + 66 },
-          { x: h.x - 66, y: h.y + 44 },
-        ]),
+        d:
+          `M${fmt(h.x - 60)} ${fmt(h.y - 16)}L${fmt(h.x + 60)} ${fmt(h.y - 16)}` +
+          `C${fmt(h.x + 64)} ${fmt(h.y + 12)} ${fmt(h.x + 68)} ${fmt(h.y + 34)} ${fmt(h.x + 66)} ${fmt(h.y + 50)}` +
+          `Q${fmt(h.x + 52)} ${fmt(h.y + 36)} ${fmt(h.x + 40)} ${fmt(h.y + 36)}` +
+          `Q${fmt(h.x + 30)} ${fmt(h.y + 54)} ${fmt(h.x + 18)} ${fmt(h.y + 66)}` +
+          `Q${fmt(h.x + 4)} ${fmt(h.y + 44)} ${fmt(h.x - 6)} ${fmt(h.y + 40)}` +
+          `Q${fmt(h.x - 20)} ${fmt(h.y + 56)} ${fmt(h.x - 32)} ${fmt(h.y + 64)}` +
+          `Q${fmt(h.x - 48)} ${fmt(h.y + 44)} ${fmt(h.x - 64)} ${fmt(h.y + 46)}` +
+          `C${fmt(h.x - 66)} ${fmt(h.y + 26)} ${fmt(h.x - 64)} ${fmt(h.y + 4)} ${fmt(h.x - 60)} ${fmt(h.y - 16)}Z`,
         fill: outfitMain,
       });
     } else {
+      const pw = isSlender ? 44 : isHeavy ? 56 : 50;
       legParts.push({
         d: poly([
-          { x: h.x - 60, y: h.y - 14 },
-          { x: h.x + 60, y: h.y - 14 },
-          { x: h.x + 58, y: h.y + 26 },
-          { x: h.x, y: h.y + 42 },
-          { x: h.x - 58, y: h.y + 26 },
+          { x: h.x - pw, y: h.y - 14 },
+          { x: h.x + pw, y: h.y - 14 },
+          { x: h.x + pw - 2, y: h.y + 24 },
+          { x: h.x, y: h.y + 38 },
+          { x: h.x - pw + 2, y: h.y + 24 },
         ]),
         fill: pants,
       });
@@ -440,22 +510,24 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   if (outfit.robe || outfit.coat) {
     const h = sk.hip;
     const hemY = outfit.robe ? -6 : -118;
-    const spread = layer.pose === 'action-lunge' || layer.pose === 'power-awakening' ? 72 : layer.pose === 'crouching' ? 40 : 22;
+    const spread = layer.pose === 'action-lunge' || layer.pose === 'power-awakening' ? 56 : layer.pose === 'crouching' ? 34 : 18;
+    const rw = isSlender ? 46 : 58;
+    const hemW = isSlender ? rw + 28 + spread : rw + 40 + spread;
     const robeD =
-      `M${fmt(h.x - 62)} ${fmt(h.y - 20)}L${fmt(h.x + 62)} ${fmt(h.y - 20)}` +
-      `C${fmt(h.x + 74)} ${fmt(h.y + 60)} ${fmt(h.x + 92 + spread)} ${fmt(hemY - 60)} ${fmt(h.x + 100 + spread)} ${fmt(hemY)}` +
-      `Q${fmt(h.x + 50)} ${fmt(hemY + 12)} ${fmt(h.x)} ${fmt(hemY + 4)}` +
-      `Q${fmt(h.x - 50)} ${fmt(hemY + 12)} ${fmt(h.x - 100 - spread)} ${fmt(hemY)}` +
-      `C${fmt(h.x - 92 - spread)} ${fmt(hemY - 60)} ${fmt(h.x - 74)} ${fmt(h.y + 60)} ${fmt(h.x - 62)} ${fmt(h.y - 20)}Z`;
+      `M${fmt(h.x - rw)} ${fmt(h.y - 18)}L${fmt(h.x + rw)} ${fmt(h.y - 18)}` +
+      `C${fmt(h.x + rw + 8)} ${fmt(h.y + 50)} ${fmt(h.x + hemW - 10)} ${fmt(hemY - 50)} ${fmt(h.x + hemW)} ${fmt(hemY)}` +
+      `Q${fmt(h.x + 35)} ${fmt(hemY + 10)} ${fmt(h.x)} ${fmt(hemY + 3)}` +
+      `Q${fmt(h.x - 35)} ${fmt(hemY + 10)} ${fmt(h.x - hemW)} ${fmt(hemY)}` +
+      `C${fmt(h.x - hemW + 10)} ${fmt(hemY - 50)} ${fmt(h.x - rw - 8)} ${fmt(h.y + 50)} ${fmt(h.x - rw)} ${fmt(h.y - 18)}Z`;
     legParts.push({ d: robeD, fill: outfit.robe ? outfitMain : darken(outfitMain, 0.05) });
     if (outfit.robe) {
       legParts.push({
-        d: `M${fmt(h.x - 96 - spread)} ${fmt(hemY - 4)}Q${fmt(h.x)} ${fmt(hemY + 14)} ${fmt(h.x + 96 + spread)} ${fmt(hemY - 4)}L${fmt(h.x + 100 + spread)} ${fmt(hemY)}Q${fmt(h.x + 50)} ${fmt(hemY + 12)} ${fmt(h.x)} ${fmt(hemY + 4)}Q${fmt(h.x - 50)} ${fmt(hemY + 12)} ${fmt(h.x - 100 - spread)} ${fmt(hemY)}Z`,
+        d: `M${fmt(h.x - hemW + 4)} ${fmt(hemY - 4)}Q${fmt(h.x)} ${fmt(hemY + 14)} ${fmt(h.x + hemW - 4)} ${fmt(hemY - 4)}L${fmt(h.x + hemW)} ${fmt(hemY)}Q${fmt(h.x + 35)} ${fmt(hemY + 10)} ${fmt(h.x)} ${fmt(hemY + 3)}Q${fmt(h.x - 35)} ${fmt(hemY + 10)} ${fmt(h.x - hemW)} ${fmt(hemY)}Z`,
         fill: accent,
         noStroke: true,
       });
       legParts.push({
-        d: `M${fmt(h.x - 3)} ${fmt(h.y - 20)}L${fmt(h.x + 3)} ${fmt(h.y - 20)}L${fmt(h.x + 4)} ${fmt(hemY + 2)}L${fmt(h.x - 4)} ${fmt(hemY + 2)}Z`,
+        d: `M${fmt(h.x - 3)} ${fmt(h.y - 18)}L${fmt(h.x + 3)} ${fmt(h.y - 18)}L${fmt(h.x + 3)} ${fmt(hemY + 2)}L${fmt(h.x - 3)} ${fmt(hemY + 2)}Z`,
         fill: accent,
         noStroke: true,
         body: false,
@@ -473,8 +545,9 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   }
 
   // Hood back.
+  const hoodBack: Part[] = [];
   if (outfit.hood) {
-    upperBack.push({
+    hoodBack.push({
       d: away
         ? 'M-58 -470C-70 -540 -50 -618 0 -622C50 -618 70 -540 58 -470Z'
         : 'M-62 -468C-74 -540 -48 -620 4 -624C56 -620 74 -540 62 -468Z',
@@ -482,67 +555,179 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     });
   }
 
-  // Arms.
-  const armW = outfit.robe ? [35, 36, 22] : outfit.armor ? [38, 33, 20] : [30, 26, 14];
+  // Arms (organic cubic Bézier deltoid → bicep → brachioradialis → tapered wrist,
+  // seamless shoulder blending with NO circular ball-joint rings, open G-pen T-junctions,
+  // and forearm-aligned organic fists).
   const sleeveColor = outfit.gi ? lighten(outfitMain, 0.05) : outfitMain;
   const armPart = (arm: [P, P, P], shade: number, side: number): Part[] => {
     const parts: Part[] = [];
-    // Wrist point: the forearm tapers to a thin wrist just before the fist, so
-    // the hand reads as a hand instead of a ball stuck on a tube.
-    const wrist = lerp(arm[1], arm[2], 0.9);
+    const wrist = lerpP(arm[1], arm[2], 0.9);
+    const armSkin = darken(skin, shade);
+    const armSkinInk = isEntity ? '#000000' : mix(darken(armSkin, 0.68), ink, 0.42);
+
     if (outfit.primitive) {
-      // Bare muscular arms with leather bracers/wraps on forearms
-      parts.push({ d: limbPath([arm[0], arm[1], wrist], [32, 27, 15]), fill: darken(skin, shade) });
-      // Deltoid cap so the arm grows out of the shoulder instead of a pinned-on tube.
-      parts.push({ d: ellipsePath(arm[0], 19, 13.5), fill: darken(skin, shade) });
-      const wrapStart = lerp(arm[1], arm[2], 0.25);
-      const wrapEnd = lerp(arm[1], arm[2], 0.88);
-      parts.push({ d: limbPath([wrapStart, wrapEnd], [26, 21]), fill: darken(outfitMain, shade + 0.15) });
-      parts.push({ d: sculptedHandPath(arm[2], 12.5, side), fill: darken(skin, shade) });
+      const armGeo = buildAnatomicalArm(arm[0], arm[1], wrist, side, {
+        bulk: 1.04,
+        shadowSide,
+      });
+      parts.push({ d: armGeo.silhouette, fill: armSkin, noStroke: true });
+      if (!isEntity) {
+        parts.push({
+          d: armGeo.celShadow,
+          fill: darken(armSkin, 0.25),
+          fillOpacity: celAlpha,
+          noStroke: true,
+          body: false,
+        });
+      }
+      // Open ink contour (ends cleanly at armpit T-junction — zero closed shoulder seam!)
       parts.push({
-        d: handDetailPath(arm[2], 12.5, side),
+        d: armGeo.outline,
         fill: 'none',
-        stroke: darken(skin, 0.5),
-        strokeWidth: 1.5,
+        stroke: armSkinInk,
+        strokeWidth: lw * 0.92,
         body: false,
       });
+      if (!isEntity) {
+        parts.push({
+          d: armGeo.anatomyCreases,
+          fill: darken(armSkin, 0.48),
+          fillOpacity: 0.78,
+          noStroke: true,
+          body: false,
+        });
+      }
+      // Sculpted leather forearm bracer hugging the brachioradialis taper
+      parts.push({
+        d: buildForearmWrapPath(arm[1], arm[2], side, 0.26, 0.87, 25, 17.5),
+        fill: darken(outfitMain, shade + 0.14),
+      });
+      // Forearm-aligned organic fist + G-pen finger grooves
+      parts.push({
+        d: anatomicalHandPath(wrist, armGeo.forearmUnit, 12.2, side),
+        fill: armSkin,
+        stroke: armSkinInk,
+      });
+      if (!isEntity) {
+        parts.push({
+          d: anatomicalHandDetailPath(wrist, armGeo.forearmUnit, 12.2, side),
+          fill: darken(armSkin, 0.5),
+          fillOpacity: 0.82,
+          noStroke: true,
+          body: false,
+        });
+      }
       return parts;
     }
-    // Bare skin limb underneath: the sleeve/cowl covers most of it and leaves a
-    // real wrist segment visible between sleeve end and fist.
-    parts.push({ d: limbPath([arm[0], arm[1], wrist], [30, 26, 14]), fill: darken(skin, shade) });
-    // Deltoid cap (sleeve color) merges the arm root into the torso silhouette.
-    const capRx = (armW[0] ?? 30) / 2 + 3.5;
-    parts.push({ d: ellipsePath(arm[0], capRx, capRx * 0.74), fill: darken(sleeveColor, shade) });
-    const sleeveEnd = outfit.gi
-      ? lerp(arm[1], arm[2], 0.15)
-      : outfit.robe
-        ? lerp(arm[1], arm[2], 0.85)
-        : lerp(arm[1], arm[2], 0.78);
-    parts.push({ d: limbPath([arm[0], arm[1], sleeveEnd], armW), fill: darken(sleeveColor, shade) });
-    const handR = outfit.armor ? 14 : 12.5;
-    parts.push({
-      d: sculptedHandPath(arm[2], handR, side),
-      fill: outfit.armor ? darken(lighten(outfitMain, 0.25), shade) : darken(skin, shade),
+
+    // Bare skin arm underneath (leaves real tapered wrist visible past sleeve cuff)
+    const bareBulk = isSlender ? 0.78 : 0.96;
+    const bareGeo = buildAnatomicalArm(arm[0], arm[1], wrist, side, {
+      bulk: bareBulk,
+      shadowSide,
     });
-    if (!outfit.armor) {
+    parts.push({ d: bareGeo.silhouette, fill: armSkin, noStroke: true });
+    if (!isEntity) {
       parts.push({
-        d: handDetailPath(arm[2], handR, side),
-        fill: 'none',
-        stroke: darken(skin, 0.5),
-        strokeWidth: 1.5,
+        d: bareGeo.celShadow,
+        fill: darken(armSkin, 0.24),
+        fillOpacity: celAlpha,
+        noStroke: true,
         body: false,
       });
     }
-    if (outfit.armor) {
+    parts.push({
+      d: bareGeo.outline,
+      fill: 'none',
+      stroke: armSkinInk,
+      strokeWidth: lw * 0.9,
+      body: false,
+    });
+
+    // Organic Bézier sleeve over the arm (closed fill + open ink contour = seamless shoulder!)
+    const sleeveRatio = outfit.gi ? 0.22 : outfit.robe ? 0.86 : 0.8;
+    const sleeveBulk = outfit.robe ? (isSlender ? 0.94 : 1.16) : outfit.armor ? 1.14 : isSlender ? 0.84 : 1.03;
+    const slColor = darken(sleeveColor, shade);
+    const sleeveGeo = buildAnatomicalArm(arm[0], arm[1], wrist, side, {
+      bulk: sleeveBulk,
+      wideSleeve: outfit.robe,
+      forearmRatio: sleeveRatio,
+      shadowSide,
+    });
+    parts.push({ d: sleeveGeo.silhouette, fill: slColor, noStroke: true });
+    if (!isEntity) {
       parts.push({
-        d: limbPath([lerp(arm[1], arm[2], 0.3), lerp(arm[1], arm[2], 0.85)], [30, 22]),
-        fill: darken(lighten(outfitMain, 0.3), shade),
+        d: sleeveGeo.celShadow,
+        fill: darken(slColor, 0.26),
+        fillOpacity: celAlpha,
+        noStroke: true,
+        body: false,
       });
     }
+    parts.push({
+      d: sleeveGeo.outline,
+      fill: 'none',
+      stroke: ink,
+      strokeWidth: lw * 0.94,
+      body: false,
+    });
+    if (!isEntity) {
+      parts.push({
+        d: sleeveGeo.anatomyCreases,
+        fill: darken(slColor, 0.48),
+        fillOpacity: 0.72,
+        noStroke: true,
+        body: false,
+      });
+    }
+
+    // Armored gauntlet
+    if (outfit.armor) {
+      parts.push({
+        d: buildForearmWrapPath(arm[1], arm[2], side, 0.28, 0.86, 27, 19),
+        fill: darken(lighten(outfitMain, 0.28), shade),
+      });
+    }
+
+    // Forearm-aligned organic fist / open casting hand for magic
+    const isFrontArm = side === 1;
+    const hasFrontWeapon = isFrontArm && layer.weaponProp && layer.weaponProp !== 'none';
+    const isMagic = hasFrontWeapon && layer.weaponProp === 'magic-orb';
+    const handR = isSlender ? 8.6 : outfit.armor ? 13.5 : 11.0;
+    const handFill = outfit.armor ? darken(lighten(outfitMain, 0.25), shade) : armSkin;
+
+    if (isMagic) {
+      parts.push({
+        d: anatomicalCastingHand(wrist, bareGeo.forearmUnit, handR, side),
+        fill: handFill,
+        stroke: armSkinInk,
+      });
+    } else if ((layer.pose === 'standing' || threeQuarter) && !hasFrontWeapon && !outfit.armor && !isEntity) {
+      parts.push({
+        d: anatomicalRelaxedHand(wrist, bareGeo.forearmUnit, handR, side),
+        fill: handFill,
+        stroke: armSkinInk,
+      });
+    } else {
+      parts.push({
+        d: anatomicalHandPath(wrist, bareGeo.forearmUnit, handR, side),
+        fill: handFill,
+        stroke: outfit.armor ? ink : armSkinInk,
+      });
+      if (!outfit.armor && !isEntity) {
+        parts.push({
+          d: anatomicalHandDetailPath(wrist, bareGeo.forearmUnit, handR, side),
+          fill: darken(armSkin, 0.5),
+          fillOpacity: 0.8,
+          noStroke: true,
+          body: false,
+        });
+      }
+    }
+
     if (outfit.neonLines) {
       parts.push({
-        d: limbPath([lerp(arm[0], arm[1], 0.2), arm[1], lerp(arm[1], arm[2], 0.88)], [4, 4, 4]),
+        d: taperedCurvePath(lerpP(arm[0], arm[1], 0.18), arm[1], lerpP(arm[1], arm[2], 0.86), 4.5),
         fill: accent,
         noStroke: true,
         body: false,
@@ -552,12 +737,14 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     return parts;
   };
 
-  if (sk.backArmBehind) upperBack.push(...armPart(sk.armBack, 0.18, -1));
+  // On primitive-hunter, tuck back arm behind the fur shoulder mantle naturally!
+  const backArmInBack = sk.backArmBehind || outfit.primitive;
+  if (backArmInBack) upperBack.push(...armPart(sk.armBack, 0.14, -1));
 
-  // Torso base (unless primitive hunter, which draws muscular chest + hide tunic separately).
-  const sh = sk.shoulderHalf / 78;
-  if (!outfit.primitive) {
-    upperParts.push({ d: torsoPath(sk.shoulderHalf), fill: outfitMain });
+  // Torso base (organic trapezius-to-hip Bézier silhouette).
+  const sh = sk.shoulderHalf / (isSlender ? 52 : 72);
+  if (!outfit.primitive || isEntity) {
+    upperParts.push({ d: anatomicalTorsoPath(sk.shoulderHalf, isSlender, REF_HIP_Y), fill: outfitMain });
   }
 
   if (outfit.blazer) {
@@ -567,14 +754,14 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     upperParts.push({ d: `M16 -472L${fmt(34 * sh)} -460L8 -392L0 -400Z`, fill: darken(outfitMain, 0.2) });
   }
   if (outfit.gi) {
-    upperParts.push({ d: `M-16 -472L24 -360L12 -352L-24 -462Z`, fill: darken(outfitMain, 0.15) });
-    upperParts.push({ d: `M16 -472L-20 -380L-26 -390L8 -470Z`, fill: darken(skin, 0.15) });
+    upperParts.push({ d: `M-14 -472Q0 -415 26 -338L14 -332Q-8 -410 -20 -468Z`, fill: darken(outfitMain, 0.15) });
+    upperParts.push({ d: `M14 -472L-12 -385L-18 -395L6 -470Z`, fill: darken(skin, 0.15) });
     upperParts.push({
-      d: `M${fmt(-52 * sh)} -316L${fmt(52 * sh)} -316L${fmt(54 * sh)} -296L${fmt(-54 * sh)} -296Z`,
+      d: `M${fmt(-44 * sh)} -322Q0 -314 ${fmt(44 * sh)} -322L${fmt(46 * sh)} -298Q0 -290 ${fmt(-46 * sh)} -298Z`,
       fill: accent,
     });
     upperParts.push({
-      d: `M10 -300L22 -250L12 -248L4 -298ZM-4 -298L-14 -246L-24 -250L-12 -300Z`,
+      d: `M6 -300Q16 -270 20 -242L12 -240Q8 -268 2 -298ZM-2 -298Q-10 -268 -14 -240L-22 -242Q-18 -270 -6 -300Z`,
       fill: accent,
     });
   }
@@ -620,18 +807,22 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     });
   }
 
-  // Front arms (pauldrons on top).
-  if (!sk.backArmBehind) upperParts.push(...armPart(sk.armBack, 0.12, -1));
+  // Front arms (sculpted pauldrons on top for armor).
+  if (!backArmInBack) upperParts.push(...armPart(sk.armBack, 0.1, -1));
   upperParts.push(...armPart(sk.armFront, 0, 1));
   if (outfit.armor) {
     const metal = lighten(outfitMain, 0.32);
-    upperParts.push({ d: ellipsePath({ x: -72 * sh, y: -452 }, 34, 24), fill: metal });
-    upperParts.push({ d: ellipsePath({ x: 72 * sh, y: -452 }, 34, 24), fill: metal });
+    upperParts.push({ d: armorPauldronPath(-70 * sh, -454, -1), fill: metal });
+    upperParts.push({ d: armorPauldronPath(70 * sh, -454, 1), fill: metal });
   }
 
-  // Head base shape (sharp Manhwa V-jawline).
-  const headFaceShape = profile ? MANHWA_FACE_PROFILE : MANHWA_FACE_FRONT;
-  const headParts: Part[] = [{ d: headFaceShape, fill: skin }];
+  // Head base shape (smooth organic Manhwa V-jawline with warm skin-toned ink).
+  const headFaceShape = profile
+    ? MANHWA_FACE_PROFILE
+    : isSlender
+      ? MANHWA_FACE_FRONT_FEMALE
+      : MANHWA_FACE_FRONT;
+  const headParts: Part[] = [{ d: headFaceShape, fill: skin, stroke: skinInk, strokeWidth: lw * 0.92 }];
   if (isEntity) {
     headParts.push({ d: 'M-30 -570C-46 -600 -62 -620 -78 -648C-58 -628 -40 -616 -20 -584Z', fill: '#07060C' });
     headParts.push({ d: 'M30 -570C46 -600 62 -620 78 -648C58 -628 40 -616 20 -584Z', fill: '#07060C' });
@@ -674,7 +865,8 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
       body: false,
     });
   }
-  if ((outfit.headband || accessories.includes('headband')) && !away) {
+  const use3DHead = threeQuarter && !isEntity && !away;
+  if (!use3DHead && (outfit.headband || accessories.includes('headband')) && !away) {
     upperFront.push({
       d: 'M-44 -558Q0 -572 44 -558L44 -548Q0 -562 -44 -548Z',
       fill: accent,
@@ -704,7 +896,7 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
 
   // ---- Defs -------------------------------------------------------------
   const shadeOpacity =
-    shading === 'soft' ? 0.32 : shading === 'heavy' ? 0.58 : shading === 'dramatic-noir' ? 0.72 : 0.46;
+    shading === 'soft' ? 0.22 : shading === 'heavy' ? 0.44 : shading === 'dramatic-noir' ? 0.6 : 0.34;
   const shadeBox =
     lightDir === 'right'
       ? { x1: 40, y1: 0, x2: -110, y2: 0 }
@@ -717,7 +909,7 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
       id,
       [
         { offset: 0, color: '#000000', opacity: 0 },
-        { offset: 0.52, color: '#000000', opacity: 0.06 },
+        { offset: 0.55, color: '#000000', opacity: 0.04 },
         { offset: 1, color: '#000000', opacity: shadeOpacity },
       ],
       0,
@@ -733,11 +925,13 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
       .map((p) => {
         const neon = p.attrs?.['data-neon'] !== undefined;
         const isDetailLine = p.fill === 'none' && p.stroke !== undefined;
+        const strokeW = p.strokeWidth ?? (isDetailLine ? 1.4 : lw * 0.94);
         return el('path', {
           d: p.d,
           fill: p.fill,
+          'fill-opacity': p.fillOpacity,
           stroke: p.noStroke ? undefined : (p.stroke ?? ink),
-          'stroke-width': p.noStroke ? undefined : (p.stroke ? (p.strokeWidth ?? 1.4) : lw),
+          'stroke-width': p.noStroke ? undefined : strokeW,
           'stroke-linejoin': 'round',
           'stroke-linecap': isDetailLine ? 'round' : undefined,
           filter: neon ? `url(#${neonId})` : undefined,
@@ -755,17 +949,59 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
       .map((p) => el('path', { d: p.d, fill: `url(#${shadeId})` }))
       .join('');
 
+  // Parametric 3D-projected Manhwa head rig for true 3/4 perspective poses
+  const head3D =
+    threeQuarter && !isEntity && !away
+      ? renderParametricHead3D({
+          yawDeg: 34,
+          pitchDeg: 4,
+          isSlender,
+          palette,
+          eyeStyle: character.eyeStyle ?? 'sharp-hunter',
+          hairStyle,
+          expression: layer.expression,
+          glowEyes: layer.glowEyes,
+          lightDirection: lightDir,
+          shadingIntensity: shading,
+          rimColor: rim,
+          lw,
+          ink,
+          defs,
+          earring: accessories.includes('earring'),
+          accent,
+          masked: outfit.mask,
+          headband: (outfit.headband || accessories.includes('headband')) && !away,
+          primitiveOutfit: Boolean(outfit.primitive),
+          coatColor: outfitMain,
+          debugGuides: process.env.TOONCRAFT_DEBUG_HEAD_GUIDES === '1',
+        })
+      : null;
+
+  const chinHandSvg =
+    head3D && layer.framing === 'close-up' && !outfit.armor && (!layer.weaponProp || layer.weaponProp === 'none')
+      ? anatomicalChinThinkHand(head3D.chinPoint, isSlender ? 0.84 : 0.95, skin, skinInk, lw)
+      : '';
+
   // High-detail Hair Back & Hair Front SVG strings
-  const hairBackSvg = !outfit.hood ? renderAnimeHairBack(hairStyle, layer.pose, hair, ink, lw) : '';
-  const hairFrontSvg =
-    !outfit.hood && !outfit.hat
-      ? renderAnimeHairFront(hairStyle, layer.pose, hair, accent, ink, lw, prng.fork('hair'))
+  const hairBackSvg = head3D
+    ? head3D.hairBackSvg
+    : !outfit.hood
+      ? renderAnimeHairBack(hairStyle, layer.pose, hair, ink, lw)
+      : '';
+  const hairFrontSvg = head3D
+    ? ''
+    : !outfit.hood && !outfit.hat
+      ? renderAnimeHairFront(hairStyle, layer.pose, hair, accent, ink, lw, prng.fork('hair'), defs, rim)
       : outfit.hat
-        ? renderAnimeHairFront('undercut-sleek', layer.pose, hair, accent, ink, lw, prng.fork('hair'))
+        ? renderAnimeHairFront('undercut-sleek', layer.pose, hair, accent, ink, lw, prng.fork('hair'), defs, rim)
         : '';
 
   // Neck + Collarbone Cel-Shading
-  const neckSvg = !isEntity ? renderNeckAndCollarCelShade(skin, ink, lw, shading, lightDir) : '';
+  const neckSvg = head3D
+    ? ''
+    : !isEntity
+      ? renderNeckAndCollarCelShade(skin, ink, lw, shading, lightDir, isSlender, threeQuarter)
+      : '<path d="M-14 -504L14 -504L18 -466L-18 -466Z" fill="#07060C"/>';
 
   // Primitive Hunter specialized torso OR standard torso clothing folds
   const primitiveTorsoSvg =
@@ -775,7 +1011,7 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   const clothingFoldsSvg =
     !outfit.primitive && !isEntity ? renderTorsoClothingFolds(outfitMain, sh, shading) : '';
 
-  // Optional Fur Collar / Bone Necklace / Cloak Clasp on non-primitive outfits
+  // Optional Fur Collar / Bone Necklace / Cloak Clasp / Layered 3D Collar on non-primitive outfits
   let torsoAccessoriesSvg = '';
   if (!isEntity) {
     if (accessories.includes('fur-collar') && !outfit.primitive) {
@@ -785,40 +1021,64 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
       torsoAccessoriesSvg += renderBoneNecklace('#F1F5F9', '#CBD5E1', darken(accent, 0.35), ink, lw);
     }
     if (accessories.includes('cloak-clasp')) {
+      const cw = isSlender ? 48 : 62;
       torsoAccessoriesSvg +=
-        el('path', { d: 'M0 -476L11 -464L0 -452L-11 -464Z', fill: accent, stroke: ink, 'stroke-width': lw * 0.85 }) +
-        el('circle', { cx: 0, cy: -464, r: 4, fill: lighten(accent, 0.45) });
+        el('path', {
+          d: `M-${fmt(cw)} -458Q0 -438 ${fmt(cw)} -458Q${fmt(cw - 8)} -430 0 -428Q-${fmt(cw - 8)} -430 -${fmt(cw)} -458Z`,
+          fill: darken(outfitMain, 0.18),
+          stroke: ink,
+          'stroke-width': lw * 0.9,
+          'stroke-linejoin': 'round',
+        }) +
+        el('path', {
+          d: `M-${fmt(cw - 6)} -456Q0 -440 ${fmt(cw - 6)} -456Q${fmt(cw - 12)} -444 0 -440Q-${fmt(cw - 12)} -444 -${fmt(cw - 6)} -456Z`,
+          fill: lighten(outfitMain, 0.14),
+          'fill-opacity': 0.35,
+        }) +
+        el('path', { d: 'M0 -458L10 -448L0 -438L-10 -448Z', fill: accent, stroke: ink, 'stroke-width': lw * 0.85 }) +
+        el('circle', { cx: 0, cy: -448, r: 3.5, fill: lighten(accent, 0.45) });
     }
   }
 
   // Ears & Facial Cel-Shading
   const earsSvg =
     !away && !isEntity
-      ? renderAnimeEars(skin, ink, lw, profile, accessories.includes('earring'), accent)
+      ? renderAnimeEars(skin, ink, lw, profile, accessories.includes('earring'), accent, isSlender, threeQuarter)
       : '';
   const faceCelShadeSvg =
     !away && !isEntity
-      ? renderFaceCelShading(skin, shading, lightDir, profile, !outfit.hood && hairStyle !== 'none')
+      ? renderFaceCelShading(
+          skin,
+          shading,
+          lightDir,
+          profile,
+          !outfit.hood && hairStyle !== 'none',
+          isSlender,
+          character.hairStyle ?? 'spiky-manhwa',
+          layer.expression,
+          threeQuarter,
+        )
       : '';
 
   // 6-Layer Anime Eyes, Brows, Nose & Mouth
   let faceDetailsSvg = '';
   const masked = outfit.mask;
   if (!away && !isEntity) {
+    const eyeOpts = {
+      palette,
+      eyeStyle: character.eyeStyle ?? 'sharp-hunter',
+      expression: layer.expression,
+      glowEyes: layer.glowEyes,
+      lightDirection: lightDir,
+      shadingIntensity: shading,
+      defs,
+      lw,
+      masked,
+      accessories,
+    };
     faceDetailsSvg = profile
       ? renderAnimeFaceProfile(palette, layer.expression, defs, lw, masked)
-      : renderAnimeFaceFront({
-          palette,
-          eyeStyle: character.eyeStyle ?? 'sharp-hunter',
-          expression: layer.expression,
-          glowEyes: layer.glowEyes,
-          lightDirection: lightDir,
-          shadingIntensity: shading,
-          defs,
-          lw,
-          masked,
-          accessories,
-        });
+      : renderAnimeFaceFront(eyeOpts);
   }
 
   // Dramatic Shadow Overlays on Face (filled directly onto face shape — no nested clipPath!)
@@ -861,8 +1121,9 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   }
 
   // Weapon Prop anchored to front hand
+  const weaponPropName = layer.weaponProp ?? 'none';
   const weaponSvg = renderWeaponProp(
-    layer.weaponProp ?? 'none',
+    weaponPropName,
     sk.armFront[2],
     layer.pose,
     accent,
@@ -870,6 +1131,18 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     lw,
     defs,
   );
+
+  // Anatomical fingers wrapped over the weapon hilt/shaft
+  let gripOverlay = '';
+  if (weaponPropName !== 'none' && weaponPropName !== 'magic-orb') {
+    const wrist = sk.armFront[2];
+    const elbow = sk.armFront[1];
+    const uFore = unit(sub(wrist, elbow));
+    const handR = isSlender ? 8.6 : outfit.armor ? 13.5 : 11.0;
+    const handFill = outfit.armor ? darken(lighten(outfitMain, 0.25), 0.15) : skin;
+    const handInk = outfit.armor ? ink : skinInk;
+    gripOverlay = anatomicalWeaponGripFingers(wrist, uFore, handR, 1, handFill, handInk, lw);
+  }
 
   // Optional Pass-2 Custom Detail SVG Overlay (sanitized)
   let customDetailSvg = '';
@@ -922,12 +1195,33 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
   }
 
   const upperAll = [...upperBack, ...upperParts];
+  // Heroic proportions: shrink the head toward the neck base so the figure reads ~25% less bobblehead.
+  const headTransform = `translate(0 -478) scale(0.78) translate(0 478)`;
   const rimOffset = 4.5 / s;
   const rimDir = lightDir === 'right' ? 1 : -1;
   const rimPass =
     `<g transform="translate(${fmt(rimOffset * rimDir * flip)} ${fmt(-rimOffset * 0.6)})">` +
     renderRim([...backLayer, ...legParts]) +
-    `<g transform="${upperTransform}">${renderRim([...upperAll, ...headParts, ...upperFront])}</g></g>`;
+    `<g transform="${upperTransform}">${renderRim(upperAll)}<g transform="${headTransform}">${renderRim(head3D ? [...hoodBack, ...upperFront] : [...hoodBack, ...headParts, ...upperFront])}</g></g></g>`;
+
+  const headContent = head3D
+    ? head3D.neckAndCollarSvg +
+      head3D.headSvg +
+      faceOverlay +
+      renderBase(upperFront) +
+      renderShade(upperFront.filter((p) => p.body !== false)) +
+      eyesGlow +
+      chinHandSvg
+    : earsSvg +
+      renderBase(headParts) +
+      faceCelShadeSvg +
+      renderShade(headParts.slice(-1)) +
+      faceDetailsSvg +
+      faceOverlay +
+      hairFrontSvg +
+      renderBase(upperFront) +
+      renderShade(upperFront.filter((p) => p.body !== false)) +
+      eyesGlow;
 
   const body =
     aura +
@@ -936,26 +1230,20 @@ export function renderCharacterFigure(layer: CharacterFigureLayer, ctx: FigureRe
     renderBase([...backLayer, ...legParts]) +
     renderShade([...backLayer, ...legParts]) +
     `<g transform="${upperTransform}">` +
-    hairBackSvg +
     renderBase(upperBack) +
+    `<g transform="${headTransform}">${hairBackSvg}${renderBase(hoodBack)}</g>` +
     neckSvg +
     primitiveTorsoSvg +
     renderBase(upperParts) +
     clothingFoldsSvg +
     torsoAccessoriesSvg +
     renderShade(upperAll) +
-    earsSvg +
-    renderBase(headParts) +
-    faceCelShadeSvg +
-    renderShade(headParts.slice(-1)) +
-    faceDetailsSvg +
-    faceOverlay +
-    hairFrontSvg +
-    renderBase(upperFront) +
-    renderShade(upperFront.filter((p) => p.body !== false)) +
+    `<g transform="${headTransform}">` +
+    headContent +
+    '</g>' +
     weaponSvg +
+    gripOverlay +
     customDetailSvg +
-    eyesGlow +
     '</g>';
 
   return `<g transform="${transform}" data-character="${character.id}">${body}</g>`;
